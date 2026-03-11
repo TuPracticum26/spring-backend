@@ -18,7 +18,7 @@ public class User {
     private String password;
 
     @Column(nullable = false)
-    private String role;
+    private List<String> role;
 
     public Long getId() {
         return id;
@@ -44,12 +44,11 @@ public class User {
         this.password = password;
     }
 
-    public String getRole() {
-        return role;
-    }
-
-    public void setRole(String role) {
+    public void setRole(List<String> role) {
         this.role = role;
     }
 
+    public List<String> getRole() {
+        return role;
+    }
 }

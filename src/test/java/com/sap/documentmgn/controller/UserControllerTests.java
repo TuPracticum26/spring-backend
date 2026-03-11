@@ -11,12 +11,13 @@ import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.boot.webmvc.test.autoconfigure.MockMvcAutoConfiguration;
 
 import static java.util.Collections.singletonList;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -25,6 +26,7 @@ public class UserControllerTests {
 
     @Autowired
     private MockMvc mockMvc;
+
     @Autowired
     private UserRepository userRepository;
     @Autowired
@@ -43,13 +45,10 @@ public class UserControllerTests {
     @Test
     public void testGetUsers() throws Exception {
         mockMvc.perform(get("/api/v1/users")
-                .with(httpBasic("gosho", "password")))
+                        .with(httpBasic("gosho", "password")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].username").value("gosho"));
     }
 
-    @AfterEach
-    void tearDown() {
-        userRepository.deleteAll();
-    }
 }
+

@@ -18,7 +18,7 @@ public class DocumentVersion {
     @Column(nullable = false)
     private Integer versionNumber;
 
-    @Column(columnDefinition = "TEXT")
+    @Lob
     private String content;
 
     @Column(nullable = false)

@@ -13,15 +13,27 @@ public class UserService {
     public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
-    public UserResponse register(RegisterRequest request){
-        Role assignedRole;
-        if(request.getRole() != null){
-            assignedRole = request.getRole();
-        } else {
-            assignedRole = Role.READER;
-        }
-        User user = new User( request.getUsername(),request.getPassword(),assignedRole );
+    public UserResponse register(RegisterRequest request) {
+        User user = new User(
+                request.getUsername(),
+                request.getPassword(),
+                Role.READER
+        );
         User savedUser = userRepository.save(user);
-        return new UserResponse(savedUser.getId(),savedUser.getUsername(),savedUser.getRole());
+        return new UserResponse(
+                savedUser.getId(),
+                savedUser.getUsername(),
+                savedUser.getRole()
+        );
+    }
+    public UserResponse updateRole(Long userID,Role newRole){
+        User user = userRepository.findById(userID).orElseThrow(() -> new RuntimeException("User not found with id: "+userID));
+        user.setRole(newRole);
+        User updatedUser = userRepository.save(user);
+        return new UserResponse(
+                updatedUser.getId(),
+                updatedUser.getUsername(),
+                updatedUser.getRole()
+        );
     }
 }

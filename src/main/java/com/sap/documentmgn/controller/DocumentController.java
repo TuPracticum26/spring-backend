@@ -1,6 +1,6 @@
 package com.sap.documentmgn.controller;
 
-import com.sap.documentmgn.entity.Document;
+import com.sap.documentmgn.dto.DocumentDTO;
 import com.sap.documentmgn.service.DocumentService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,7 +19,7 @@ public class DocumentController {
     }
 
     @GetMapping("/documents")
-    public List<Document> getDocuments() {
+    public List<DocumentDTO> getDocuments() {
         return documentService.getDocuments();
     }
 }

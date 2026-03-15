@@ -18,7 +18,7 @@ public class DocumentService {
     public DocumentDTO getDocumentById(Long id) {
         Document document = documentRepository.findById(id)
                         .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Document not found"));
-        return new DocumentDTO(document.getId(), document.getTitle());
+        return new DocumentDTO(document.getId(), document.getTitle(), document.getAuthor().getUsername(), document.getCreatedAt());
     }
 
 

@@ -20,23 +20,24 @@ public class DocumentService {
     @Autowired
     private UserRepository userRepository;
 
-    public void approveVersion(Long docId, Long verId, Long userId) {
-            Document document = documentRepository.findById(docId).orElseThrow(() -> new RuntimeException("document not found!"));
+    public void approveVersion(Long docId, Long versionNumber, String username) {
+            Document document = documentRepository.findById(docId).orElseThrow(() -> new RuntimeException("404 e not found"));
 
-            DocumentVersion version = documentVersionRepository.findById(verId).orElseThrow(() -> new RuntimeException("version not found!"));
+            DocumentVersion version = documentVersionRepository.findById(versionNumber).orElseThrow(() -> new RuntimeException("404 e not found"));
 
-            User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("user not found!"));
-
+            User user = userRepository.findByUsername(username);
+            if (user == null){
+                throw new RuntimeException("401 (unauthenticated)");
+            }
             if (!version.getDocument().getId().equals(document.getId())){
-                throw new RuntimeException("document version doesn't match!");
+                throw new RuntimeException("400 (bad request)");
             }
             if (!user.getRole().equalsIgnoreCase("admin") && !user.getRole().equalsIgnoreCase("reviewer")){
-                throw new RuntimeException("User not allowed to approve document");
+                throw new RuntimeException("403 (forbidden)");
             }
 
             version.setStatus("approved");
-            version.setCreatedAt(LocalDateTime.now());
-            version.setCreatedBy(user);
+            version.updateEvent(user);
 
             documentVersionRepository.save(version);
     }

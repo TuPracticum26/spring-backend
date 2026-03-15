@@ -86,4 +86,9 @@ public class DocumentVersion {
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
+
+    public void updateEvent(User user) {
+        this.createdBy = user;
+        this.createdAt = LocalDateTime.now();
+    }
 }

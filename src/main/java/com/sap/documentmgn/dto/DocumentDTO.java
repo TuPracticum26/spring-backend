@@ -1,6 +1,7 @@
 package com.sap.documentmgn.dto;
 
 import com.sap.documentmgn.entity.User;
+import com.sap.documentmgn.entity.DocumentVersion;
 
 import java.time.LocalDateTime;
 
@@ -8,12 +9,14 @@ public class DocumentDTO {
     private Long id;
     private String title;
     private String authorUsername;
+    private String content;
     private LocalDateTime creationDate;
 
-    public DocumentDTO(Long  id, String title, String authorUsername,  LocalDateTime creationDate) {
+    public DocumentDTO(Long  id, String title, String authorUsername, String content,  LocalDateTime creationDate) {
         this.id = id;
         this.title = title;
         this.authorUsername = authorUsername;
+        this.content = content;
         this.creationDate = creationDate;
     }
 
@@ -36,6 +39,13 @@ public class DocumentDTO {
     }
     public void setAuthorUsername(String authorUsername) {
         this.authorUsername = authorUsername;
+    }
+
+    public String getContent() {
+        return content;
+    }
+    public void setContent(String content) {
+        this.content = content;
     }
 
     public LocalDateTime getCreationDate() {

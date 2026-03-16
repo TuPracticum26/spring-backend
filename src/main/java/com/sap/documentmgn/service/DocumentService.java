@@ -26,13 +26,13 @@ public class DocumentService {
             DocumentVersion version = documentVersionRepository.findById(versionNumber).orElseThrow(() -> new RuntimeException("404 e not found"));
 
             User user = userRepository.findByUsername(username);
-            if (user == null){
+            if (user == null) {
                 throw new RuntimeException("401 (unauthenticated)");
             }
-            if (!version.getDocument().getId().equals(document.getId())){
+            if (!version.getDocument().getId().equals(document.getId())) {
                 throw new RuntimeException("400 (bad request)");
             }
-            if (!user.getRole().equalsIgnoreCase("admin") && !user.getRole().equalsIgnoreCase("reviewer")){
+            if (!user.getRole().equalsIgnoreCase("admin") && !user.getRole().equalsIgnoreCase("reviewer")) {
                 throw new RuntimeException("403 (forbidden)");
             }
 

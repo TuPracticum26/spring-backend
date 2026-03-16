@@ -4,6 +4,7 @@ import com.sap.documentmgn.entity.Document;
 import com.sap.documentmgn.repository.DocumentRepository;
 import org.springframework.stereotype.Service;
 import com.sap.documentmgn.dto.DocumentDTO;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,9 +21,25 @@ public class DocumentService {
         List<Document> documents = documentRepository.findAll();
         List<DocumentDTO> listOfDocuments = new ArrayList<>();
         for (Document doc : documents) {
-            DocumentDTO dto = new DocumentDTO(doc.getId(), doc.getTitle(), doc.getAuthor(), doc.getVersions());
-            listOfDocuments.add(dto);
+            listOfDocuments.add(
+                    new DocumentDTO(
+                            doc.getId(),
+                            doc.getTitle(),
+                            doc.getAuthor().getUsername(),
+                            doc.getVersions()));
+
         }
         return listOfDocuments;
     }
+
+    public Document getDocumentById(Long id) {
+        List<Document> documents = documentRepository.findAll();
+        for (Document doc : documents) {
+            if (doc.getId().equals(id)) {
+                return doc;
+            }
+        }
+        return null;
+    }
+
 }

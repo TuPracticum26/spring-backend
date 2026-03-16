@@ -24,9 +24,7 @@ public class DocumentService {
             listOfDocuments.add(
                     new DocumentDTO(
                             doc.getId(),
-                            doc.getTitle(),
-                            doc.getAuthor().getUsername(),
-                            doc.getVersions()));
+                            doc.getTitle()));
 
         }
         return listOfDocuments;

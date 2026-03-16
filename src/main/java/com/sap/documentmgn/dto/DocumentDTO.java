@@ -6,18 +6,12 @@ import java.util.List;
 public class DocumentDTO {
     private Long id;
     private String title;
-    private String author;
-    private List<DocumentVersion> versions;
 
-    public DocumentDTO(Long id, String title, String author, List<DocumentVersion> version){
+    public DocumentDTO(Long id, String title){
         this.id = id;
         this.title = title;
-        this.author = author;
-        this.versions = version;
     }
 
     public Long getId() { return id; }
     public String getTitle() { return title; }
-    public String getAuthorUsername() { return author; }
-    public List<DocumentVersion> getVersions() { return versions; }
 }

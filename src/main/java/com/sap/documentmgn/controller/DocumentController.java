@@ -1,5 +1,7 @@
 package com.sap.documentmgn.controller;
 
+<<<<<<< HEAD
+import com.sap.documentmgn.dto.DocumentDTO;
 import com.sap.documentmgn.entity.Document;
 import com.sap.documentmgn.entity.User;
 import com.sap.documentmgn.repository.DocumentRepository;
@@ -10,6 +12,7 @@ import org.apache.tomcat.util.net.openssl.ciphers.Authentication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -49,4 +52,9 @@ public class DocumentController {
             return ResponseEntity.internalServerError().build();
         }
     }
+    @GetMapping("/{docId}")
+    public DocumentDTO getDocument(@PathVariable Long docId) {
+        return documentService.getDocumentById(docId);
+    }
+
 }

@@ -29,15 +29,4 @@ public class DocumentService {
         }
         return listOfDocuments;
     }
-
-    public Document getDocumentById(Long id) {
-        List<Document> documents = documentRepository.findAll();
-        for (Document doc : documents) {
-            if (doc.getId().equals(id)) {
-                return doc;
-            }
-        }
-        return null;
-    }
-
 }

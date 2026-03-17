@@ -24,8 +24,4 @@ public class DocumentController {
     public List<DocumentDTO> getDocuments() {
         return documentService.getDocuments();
     }
-    @GetMapping("/{ids}")
-    public Document getDocumentsIds(@PathVariable Long id) {
-        return documentService.getDocumentById(id);
-    }
 }

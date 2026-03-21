@@ -6,6 +6,7 @@ import com.sap.documentmgn.entity.User;
 import com.sap.documentmgn.repository.DocumentRepository;
 import com.sap.documentmgn.repository.DocumentVersionRepository;
 import com.sap.documentmgn.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.*;
@@ -15,24 +16,11 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class DocumentService {
-    @Autowired
     private final DocumentRepository documentRepository;
-    @Autowired
-    private DocumentVersionRepository documentVersionRepository;
-    @Autowired
-    private UserRepository userRepository;
-
-    public DocumentService(DocumentRepository documentRepository, DocumentVersionRepository documentVersionRepository, UserRepository userRepository) {
-        this.documentRepository = documentRepository;
-        this.documentVersionRepository = documentVersionRepository;
-        this.userRepository = userRepository;
-    }
-
-
-    public DocumentService(DocumentRepository documentRepository) {
-        this.documentRepository = documentRepository;
-    }
+    private final DocumentVersionRepository documentVersionRepository;
+    private final UserRepository userRepository;
 
     public List<DocumentDTO> getDocuments() {
         List<Document> documents = documentRepository.findAll();
@@ -48,19 +36,21 @@ public class DocumentService {
     }
 
     public void approveVersion(Long docId, Long versionNumber, String username) {
-        Document document = documentRepository.findById(docId).orElseThrow(() -> new RuntimeException("404 e not found"));
+        Document document = documentRepository.findById(docId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Document not found"));
 
-        DocumentVersion version = documentVersionRepository.findById(versionNumber).orElseThrow(() -> new RuntimeException("404 e not found"));
+        DocumentVersion version = documentVersionRepository.findById(versionNumber)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Version not found"));
 
         User user = userRepository.findByUsername(username);
         if (user == null) {
-            throw new RuntimeException("401 (unauthenticated)");
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not found");
         }
         if (!version.getDocument().getId().equals(document.getId())) {
-            throw new RuntimeException("400 (bad request)");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Version does not belong to the specified document");
         }
         if (!user.getRole().equalsIgnoreCase("admin") && !user.getRole().equalsIgnoreCase("reviewer")) {
-            throw new RuntimeException("403 (forbidden)");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User does not have permission to approve versions");
         }
 
         version.setStatus("approved");

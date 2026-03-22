@@ -3,64 +3,51 @@ import com.sap.documentmgn.dto.DocumentDTO;
 import com.sap.documentmgn.entity.Document;
 import com.sap.documentmgn.entity.DocumentVersion;
 import com.sap.documentmgn.entity.User;
+import com.sap.documentmgn.mapper.DocumentMapper;
 import com.sap.documentmgn.repository.DocumentRepository;
 import com.sap.documentmgn.repository.DocumentVersionRepository;
 import com.sap.documentmgn.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.*;
 import org.springframework.web.server.ResponseStatusException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class DocumentService {
-    @Autowired
     private final DocumentRepository documentRepository;
-    @Autowired
-    private DocumentVersionRepository documentVersionRepository;
-    @Autowired
-    private UserRepository userRepository;
-
-    public DocumentService(DocumentRepository documentRepository, DocumentVersionRepository documentVersionRepository, UserRepository userRepository) {
-        this.documentRepository = documentRepository;
-        this.documentVersionRepository = documentVersionRepository;
-        this.userRepository = userRepository;
-    }
-
-
-    public DocumentService(DocumentRepository documentRepository) {
-        this.documentRepository = documentRepository;
-    }
+    private final DocumentVersionRepository documentVersionRepository;
+    private final UserRepository userRepository;
+    private final DocumentMapper documentMapper;
 
     public List<DocumentDTO> getDocuments() {
         List<Document> documents = documentRepository.findAll();
-        List<DocumentDTO> listOfDocuments = new ArrayList<>();
-        for (Document doc : documents) {
-            listOfDocuments.add(
-                    new DocumentDTO(
-                            doc.getId(),
-                            doc.getTitle()));
-
-        }
-        return listOfDocuments;
+        return documents.stream().map(documentMapper::toDocumentDTO).collect(Collectors.toList());
     }
 
-    public void approveVersion(Long docId, Long versionNumber, String username) {
-        Document document = documentRepository.findById(docId).orElseThrow(() -> new RuntimeException("404 e not found"));
 
-        DocumentVersion version = documentVersionRepository.findById(versionNumber).orElseThrow(() -> new RuntimeException("404 e not found"));
+    public void approveVersion(Long docId, Long versionNumber, String username) {
+        Document document = documentRepository.findById(docId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Document not found"));
+
+        DocumentVersion version = documentVersionRepository.findById(versionNumber)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Version not found"));
 
         User user = userRepository.findByUsername(username);
         if (user == null) {
-            throw new RuntimeException("401 (unauthenticated)");
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not found");
         }
         if (!version.getDocument().getId().equals(document.getId())) {
-            throw new RuntimeException("400 (bad request)");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Version does not belong to the specified document");
         }
         if (!user.getRole().equalsIgnoreCase("admin") && !user.getRole().equalsIgnoreCase("reviewer")) {
-            throw new RuntimeException("403 (forbidden)");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User does not have permission to approve versions");
         }
 
         version.setStatus("approved");
@@ -69,11 +56,12 @@ public class DocumentService {
         documentVersionRepository.save(version);
     }
 
+
     public DocumentDTO getDocumentById(Long id) {
         Document document = documentRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Document not found"));
         DocumentVersion latestVersion = documentVersionRepository.findTopByDocumentIdOrderByVersionNumberDesc(document.getId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Document has no versions"));
-        return new DocumentDTO(document.getId(), document.getTitle(), document.getAuthor().getUsername(), latestVersion.getContent(), document.getCreatedAt());
+        return documentMapper.toDocumentDTO(document, latestVersion);
     }
 }

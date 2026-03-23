@@ -27,31 +27,14 @@ public class DocumentController {
         return documentService.getDocuments();
     }
 
+
     @PostMapping("{docId}/versions/{versionNumber}/approve")
     public ResponseEntity DocumentApprove(@PathVariable Long docId, @PathVariable Long versionNumber, Principal principal){
-        try {
-
-            String username = principal.getName();
-            documentService.approveVersion(docId, versionNumber, username);
-            return ResponseEntity.ok().build();
-        }
-        catch(RuntimeException e){
-            String message = e.getMessage();
-            if(message.contains("404")){
-                return ResponseEntity.notFound().build();
-            }
-            else if(message.contains("401")){
-                return ResponseEntity.status(401).build();
-            }
-            else if(message.contains("403")){
-                return ResponseEntity.status(403).build();
-            }
-            else if(message.contains("400")){
-                return ResponseEntity.badRequest().build();
-            }
-            return ResponseEntity.internalServerError().build();
-        }
+        String username = principal.getName();
+        documentService.approveVersion(docId, versionNumber, username);
+        return ResponseEntity.ok().build();
     }
+
     @GetMapping("/{docId}")
     public DocumentDTO getDocument(@PathVariable Long docId) {
         return documentService.getDocumentById(docId);

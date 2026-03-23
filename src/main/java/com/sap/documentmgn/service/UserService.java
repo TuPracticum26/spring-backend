@@ -1,31 +1,22 @@
 package com.sap.documentmgn.service;
 import com.sap.documentmgn.dto.UserDTO;
 import com.sap.documentmgn.entity.User;
+import com.sap.documentmgn.mapper.UserMapper;
 import com.sap.documentmgn.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
-public class UserService {
+@RequiredArgsConstructor
+public class UserService{
     private final UserRepository userRepository;
+    private final UserMapper userMapper;
 
-    public UserService(UserRepository userRepository){
-        this.userRepository = userRepository;
-    }
-
-    public List<UserDTO> getUsers(){
+    public List<UserDTO> getUsers() {
         List<User> users = userRepository.findAll();
-        List<UserDTO> usersDTO = new ArrayList<>();
-
-        for( User user: users){
-            UserDTO userDTO = new UserDTO();
-            userDTO.setId(user.getId());
-            userDTO.setUsername(user.getUsername());
-            userDTO.setRole(user.getRole());
-            usersDTO.add(userDTO);
-        }
-        return usersDTO;
+        return users.stream().map(userMapper::toUserDTO).collect(Collectors.toList());
     }
-
 }

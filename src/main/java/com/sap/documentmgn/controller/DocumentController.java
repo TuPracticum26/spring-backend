@@ -35,6 +35,7 @@ public class DocumentController {
         return ResponseEntity.ok().build();
     }
 
+
     @GetMapping("/{docId}")
     public DocumentDTO getDocument(@PathVariable Long docId) {
         return documentService.getDocumentById(docId);

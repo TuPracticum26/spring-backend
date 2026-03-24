@@ -1,28 +1,15 @@
 package com.sap.documentmgn.dto;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+
+@Data
+@AllArgsConstructor
 public class UserDTO {
     private Long id;
     private String username;
     private String role;
+        public UserDTO() {
 
-    public UserDTO(){}
-
-    public long getID() {
-        return id;
-    }
-    public String getUsername(){
-        return username;
-    }
-    public String getRole(){
-        return role;
-    }
-    public void setId(long id) {
-        this.id = id;
-    }
-    public void setUsername(String username){
-        this.username = username;
-    }
-    public void setRole(String role){
-        this.role=role;
-    }
+        }
 }

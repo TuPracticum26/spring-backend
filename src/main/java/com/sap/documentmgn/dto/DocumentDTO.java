@@ -1,10 +1,11 @@
 package com.sap.documentmgn.dto;
-
-import com.sap.documentmgn.entity.User;
-import com.sap.documentmgn.entity.DocumentVersion;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
 import java.time.LocalDateTime;
 
+@Data
+@AllArgsConstructor
 public class DocumentDTO {
     private Long id;
     private String title;
@@ -12,47 +13,8 @@ public class DocumentDTO {
     private String content;
     private LocalDateTime creationDate;
 
-    public DocumentDTO(Long  id, String title, String authorUsername, String content,  LocalDateTime creationDate) {
+    public DocumentDTO(Long id, String title) {
         this.id = id;
         this.title = title;
-        this.authorUsername = authorUsername;
-        this.content = content;
-        this.creationDate = creationDate;
     }
-
-    public Long getId() {
-        return id;
-    }
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getAuthorUsername() {
-        return authorUsername;
-    }
-    public void setAuthorUsername(String authorUsername) {
-        this.authorUsername = authorUsername;
-    }
-
-    public String getContent() {
-        return content;
-    }
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-    public LocalDateTime getCreationDate() {
-        return creationDate;
-    }
-    public void setCreationDate(LocalDateTime creationDate) {
-        this.creationDate = creationDate;
-    }
-
 }

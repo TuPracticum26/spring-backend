@@ -3,18 +3,15 @@ package com.sap.documentmgn.service;
 import com.sap.documentmgn.dto.DocumentVersionDTO;
 import com.sap.documentmgn.entity.DocumentVersion;
 import com.sap.documentmgn.repository.DocumentVersionRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 @Service
+@RequiredArgsConstructor
 public class DocumentVersionService {
     private final DocumentVersionRepository documentVersionRepository;
-
-    public DocumentVersionService(DocumentVersionRepository documentVersionRepository) {
-        this.documentVersionRepository = documentVersionRepository;
-    }
 
     public DocumentVersionDTO rejectVersion(Long documentId, Long versionId) {
         DocumentVersion version = documentVersionRepository.findById(versionId)

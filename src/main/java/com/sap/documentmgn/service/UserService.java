@@ -13,10 +13,4 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class UserService{
     private final UserRepository userRepository;
-    private final UserMapper userMapper;
-
-    public List<UserDTO> getUsers() {
-        List<User> users = userRepository.findAll();
-        return users.stream().map(userMapper::toUserDTO).collect(Collectors.toList());
-    }
-}
+    private final UserMapper userMapper

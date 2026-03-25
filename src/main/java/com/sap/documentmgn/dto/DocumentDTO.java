@@ -12,9 +12,4 @@ public class DocumentDTO {
     private String authorUsername;
     private String content;
     private LocalDateTime creationDate;
-
-    public DocumentDTO(Long id, String title) {
-        this.id = id;
-        this.title = title;
-    }
 }

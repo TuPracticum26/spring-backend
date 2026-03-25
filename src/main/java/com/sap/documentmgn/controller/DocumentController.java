@@ -12,12 +12,6 @@ import java.security.Principal;
 import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
-
-@RestController
-@RequestMapping("/api/v1/documents")
-public class DocumentController {
-    private final DocumentService documentService;
-
     public DocumentController(DocumentService documentService) {
         this.documentService = documentService;
     }

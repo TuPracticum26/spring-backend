@@ -30,11 +30,18 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     @DeleteMapping("/api/v1/admin/deleteUser/{userId}")
     public ResponseEntity deleteUser(@PathVariable Long userId, Principal principal) {
         String adminUsername = principal.getName();
         userService.deleteUser(userId, adminUsername);
+        return ResponseEntity.ok().build();
+    }
+
+    @PreAuthorize("hasAuthority('ADMIN') || hasAuthority('AUTHOR')")
+    @DeleteMapping("/api/v1/admin/deleteDocument/{documentId}")
+    public ResponseEntity deleteDocument(@PathVariable Long documentId) {
+        userService.deleteDocument(documentId);
         return ResponseEntity.ok().build();
     }
 }

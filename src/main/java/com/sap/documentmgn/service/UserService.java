@@ -1,7 +1,9 @@
 package com.sap.documentmgn.service;
 import com.sap.documentmgn.dto.UserDTO;
+import com.sap.documentmgn.entity.Document;
 import com.sap.documentmgn.entity.User;
 import com.sap.documentmgn.mapper.UserMapper;
+import com.sap.documentmgn.repository.DocumentRepository;
 import com.sap.documentmgn.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -15,6 +17,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class UserService{
     private final UserRepository userRepository;
+    private final DocumentRepository documentRepository;
     private final UserMapper userMapper;
 
     public List<UserDTO> getUsers() {
@@ -50,5 +53,13 @@ public class UserService{
         }
 
         userRepository.delete(user);
+    }
+
+    public void deleteDocument(Long documentId) {
+
+        Document document = documentRepository.findById(documentId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Document not found"));
+
+        documentRepository.delete(document);
     }
 }

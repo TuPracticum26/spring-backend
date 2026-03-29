@@ -2,7 +2,6 @@ package com.sap.documentmgn.service;
 
 import com.sap.documentmgn.entity.User;
 import com.sap.documentmgn.repository.UserRepository;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -25,7 +24,7 @@ public class CustomUserDetailService implements UserDetailsService {
         return org.springframework.security.core.userdetails.User.builder()
                 .username(user.getUsername())
                 .password(user.getPassword())
-                .roles(user.getRole().toArray(String[]::new))
+                .roles(user.getRole().toArray(new String[0]))
                 .build();
     }
 }

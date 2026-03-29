@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import jakarta.validation.constraints.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -27,5 +28,14 @@ public class User {
     private String password;
 
     @NotBlank
-    private String role;
+    private List<String> role;
+
+    public void addRole(String role) {
+        if (this.role == null) {
+            this.role = new ArrayList<>();
+        }
+        if (!this.role.contains(role)) {
+            this.role.add(role);
+        }
+    }
 }

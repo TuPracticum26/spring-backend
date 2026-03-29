@@ -30,7 +30,7 @@ public class UserService{
     public void setRole(Long userId, String role, String adminUsername) {
         User admin = userRepository.findByUsername(adminUsername);
 
-        if (!role.equalsIgnoreCase("admin") && !role.equalsIgnoreCase("author") && !role.equalsIgnoreCase("reviewer") && !role.equalsIgnoreCase("reader")) {
+        if (!role.contains("admin") && !role.equalsIgnoreCase("author") && !role.contains("reviewer") && !role.contains("reader")) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Invalid Role");
         }
 
@@ -41,7 +41,7 @@ public class UserService{
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot change your own role");
         }
 
-        user.setRole(role);
+        user.addRole(role);
         userRepository.save(user);
     }
 

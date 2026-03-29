@@ -29,4 +29,12 @@ public class UserController {
         userService.setRole(userId, role, adminUsername);
         return ResponseEntity.ok().build();
     }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @DeleteMapping("/api/v1/admin/deleteUser/{userId}")
+    public ResponseEntity deleteUser(@PathVariable Long userId, Principal principal) {
+        String adminUsername = principal.getName();
+        userService.deleteUser(userId, adminUsername);
+        return ResponseEntity.ok().build();
+    }
 }

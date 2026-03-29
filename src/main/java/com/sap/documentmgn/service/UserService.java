@@ -22,8 +22,8 @@ public class UserService{
         return users.stream().map(userMapper::toUserDTO).collect(Collectors.toList());
     }
 
-    public void setRole(Long userId, String role, String adminName) {
-        User admin = userRepository.findByUsername(adminName);
+    public void setRole(Long userId, String role, String adminUsername) {
+        User admin = userRepository.findByUsername(adminUsername);
 
         if (!role.equalsIgnoreCase("admin") && !role.equalsIgnoreCase("author") && !role.equalsIgnoreCase("reviewer") && !role.equalsIgnoreCase("reader")) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Invalid Role");
@@ -38,5 +38,17 @@ public class UserService{
 
         user.setRole(role);
         userRepository.save(user);
+    }
+
+    public void deleteUser(Long userId, String adminUsername) {
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        if (user.getUsername().equals(adminUsername)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot delete your admin account");
+        }
+
+        userRepository.delete(user);
     }
 }

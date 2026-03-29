@@ -10,7 +10,7 @@ import java.util.List;
 public class UserDTO {
     private Long id;
     private String username;
-    private List<String> role;
+    private String role;
         public UserDTO() {
 
         }

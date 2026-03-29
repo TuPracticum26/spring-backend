@@ -27,5 +27,5 @@ public class User {
     private String password;
 
     @NotBlank
-    private List<String> role;
+    private String role;
 }

@@ -46,7 +46,7 @@ public class DocumentService {
         if (!version.getDocument().getId().equals(document.getId())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Version does not belong to the specified document");
         }
-        if (!user.getRole().contains("admin") && !user.getRole().contains("reviewer")) {
+        if (!user.getRole().equalsIgnoreCase("admin") && !user.getRole().equalsIgnoreCase("reviewer")) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User does not have permission to approve versions");
         }
 

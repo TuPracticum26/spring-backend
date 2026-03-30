@@ -1,9 +1,16 @@
 package com.sap.documentmgn.entity;
-import com.sap.documentmgn.enums.Role;
+
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+import jakarta.validation.constraints.*;
+
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@Getter
+@Setter
 @Table(name = "users")
 public class User {
 
@@ -11,44 +18,24 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true)
+    @NotBlank
+    @Column(unique = true)
     private String username;
 
-    @Column(nullable = false)
+    @NotBlank
+    @Size(min = 8)
+    @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[!@#$%^&*()_+\\-={}\\[\\]:;\"'<>,.?/])[A-Za-z\\d!@#$%^&*()_+\\-={}\\[\\]:;\"'<>,.?/]+$", message = "Password must contain at least 1 letter, 1 number, and 1 special character!")
     private String password;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private Role role;
+    @NotBlank
+    private List<String> role;
 
-    private User(){}
-    public User(String username, String password, Role role) {
-        this.username = username;
-        this.password = password;
-        this.role = role;
+    public void addRole(String role) {
+        if (this.role == null) {
+            this.role = new ArrayList<>();
+        }
+        if (!this.role.contains(role)) {
+            this.role.add(role);
+        }
     }
-
-    public Long getId() { return id; }
-    public void setId(Long id) {
-        this.id = id;
-    }
-    public String getUsername() {
-        return username;
-    }
-    public void setUsername(String username) {
-        this.username = username;
-    }
-    public String getPassword() {
-        return password;
-    }
-    public void setPassword(String password) {
-        this.password = password;
-    }
-    public Role getRole() {
-        return role;
-    }
-    public void setRole(Role role) {
-        this.role = role;
-    }
-
 }

@@ -1,7 +1,9 @@
 package com.sap.documentmgn.controller;
 
 import com.sap.documentmgn.dto.UserDTO;
+import com.sap.documentmgn.entity.ROLES;
 import com.sap.documentmgn.service.UserService;
+import org.jspecify.annotations.NonNull;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -24,23 +26,23 @@ public class UserController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/api/v1/admin/setRole/{userId}/{role}")
-    public ResponseEntity setRole(@PathVariable Long userId, @PathVariable String role, Principal principal) {
+    public ResponseEntity<?> setRole(@PathVariable Long userId, @PathVariable ROLES role, @NonNull Principal principal) {
         String adminUsername = principal.getName();
         userService.setRole(userId, role, adminUsername);
         return ResponseEntity.ok().build();
     }
 
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/api/v1/admin/deleteUser/{userId}")
-    public ResponseEntity deleteUser(@PathVariable Long userId, Principal principal) {
+    public ResponseEntity<?> deleteUser(@PathVariable Long userId, @NonNull Principal principal) {
         String adminUsername = principal.getName();
         userService.deleteUser(userId, adminUsername);
         return ResponseEntity.ok().build();
     }
 
-    @PreAuthorize("hasAuthority('ADMIN') || hasAuthority('AUTHOR')")
+    @PreAuthorize("hasRole('ADMIN') || hasRole('AUTHOR')")
     @DeleteMapping("/api/v1/admin/deleteDocument/{documentId}")
-    public ResponseEntity deleteDocument(@PathVariable Long documentId) {
+    public ResponseEntity<?> deleteDocument(@PathVariable Long documentId) {
         userService.deleteDocument(documentId);
         return ResponseEntity.ok().build();
     }

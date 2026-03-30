@@ -2,17 +2,16 @@ package com.sap.documentmgn.service;
 import com.sap.documentmgn.dto.DocumentDTO;
 import com.sap.documentmgn.entity.Document;
 import com.sap.documentmgn.entity.DocumentVersion;
+import com.sap.documentmgn.entity.ROLES;
 import com.sap.documentmgn.entity.User;
 import com.sap.documentmgn.mapper.DocumentMapper;
 import com.sap.documentmgn.repository.DocumentRepository;
 import com.sap.documentmgn.repository.DocumentVersionRepository;
 import com.sap.documentmgn.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.*;
 import org.springframework.web.server.ResponseStatusException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -46,7 +45,7 @@ public class DocumentService {
         if (!version.getDocument().getId().equals(document.getId())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Version does not belong to the specified document");
         }
-        if (!user.getRole().contains("admin") && !user.getRole().contains("reviewer")) {
+        if (!user.getRole().contains(ROLES.ADMIN) && !user.getRole().contains(ROLES.REVIEWER)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User does not have permission to approve versions");
         }
 

@@ -25,6 +25,7 @@ public class UserService{
     private final DocumentRepository documentRepository;
     private final UserMapper userMapper;
 
+
     public UserResponse register(RegisterRequest request){
         User user = new User();
         user.setUsername(request.getUsername());
@@ -33,11 +34,10 @@ public class UserService{
         user.addRole(ROLES.READER);
         User savedUser = userRepository.save(user);
 
-        List<String> roleStrings = savedUser.getRole().stream().map(Enum::name).collect(Collectors.toList());
         return new UserResponse(
                 savedUser.getId(),
                 savedUser.getUsername(),
-                roleStrings
+                savedUser.getRole()
         );
     }
 

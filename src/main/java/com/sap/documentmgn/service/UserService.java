@@ -1,6 +1,7 @@
 package com.sap.documentmgn.service;
 import com.sap.documentmgn.dto.UserDTO;
 import com.sap.documentmgn.entity.Document;
+import com.sap.documentmgn.entity.ROLES;
 import com.sap.documentmgn.entity.User;
 import com.sap.documentmgn.mapper.UserMapper;
 import com.sap.documentmgn.repository.DocumentRepository;
@@ -27,10 +28,10 @@ public class UserService{
         return users.stream().map(userMapper::toUserDTO).collect(Collectors.toList());
     }
 
-    public void setRole(Long userId, String role, String adminUsername) {
+    public void setRole(Long userId, ROLES role, String adminUsername) {
         User admin = userRepository.findByUsername(adminUsername);
 
-        if (!role.contains("admin") && !role.equalsIgnoreCase("author") && !role.contains("reviewer") && !role.contains("reader")) {
+        if (!role.equals(ROLES.ADMIN) && !role.equals(ROLES.AUTHOR) && !role.equals(ROLES.REVIEWER) && !role.equals(ROLES.READER)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Invalid Role");
         }
 

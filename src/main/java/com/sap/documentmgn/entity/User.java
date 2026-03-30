@@ -28,9 +28,9 @@ public class User {
     private String password;
 
     @NotBlank
-    private List<String> role;
+    private List<ROLES> role;
 
-    public void addRole(String role) {
+    public void addRole(ROLES role) {
         if (this.role == null) {
             this.role = new ArrayList<>();
         }

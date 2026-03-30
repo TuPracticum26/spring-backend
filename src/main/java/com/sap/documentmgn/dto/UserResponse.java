@@ -3,7 +3,7 @@ package com.sap.documentmgn.dto;
 import com.sap.documentmgn.enums.Role;
 import java.util.List;
 
-public class    UserResponse{
+public class UserResponse{
     private Long id;
     private String username;
     private List<String> role;

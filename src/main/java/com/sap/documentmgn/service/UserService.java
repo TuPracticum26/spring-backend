@@ -30,12 +30,14 @@ public class UserService{
         user.setUsername(request.getUsername());
         user.setPassword(request.getPassword());
 
-        user.addRole("READER");
+        user.addRole(ROLES.READER);
         User savedUser = userRepository.save(user);
+
+        List<String> roleStrings = savedUser.getRole().stream().map(Enum::name).collect(Collectors.toList());
         return new UserResponse(
                 savedUser.getId(),
                 savedUser.getUsername(),
-                savedUser.getRole()
+                roleStrings
         );
     }
 
@@ -82,5 +84,4 @@ public class UserService{
 
         documentRepository.delete(document);
     }
-
 }

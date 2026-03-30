@@ -27,7 +27,7 @@ public class User {
     @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[!@#$%^&*()_+\\-={}\\[\\]:;\"'<>,.?/])[A-Za-z\\d!@#$%^&*()_+\\-={}\\[\\]:;\"'<>,.?/]+$", message = "Password must contain at least 1 letter, 1 number, and 1 special character!")
     private String password;
 
-    @NotBlank
+    @NotEmpty
     private List<ROLES> role;
 
     public void addRole(ROLES role) {

@@ -12,11 +12,11 @@ import java.util.ArrayList;
 @Mapper(componentModel = "spring")
 public interface UserMapper {
 
-    @Mapping(target = "role", qualifiedByName = "copyRoles")
+    @Mapping(target = "roles", qualifiedByName = "copyRoles")
     @Mapping(target = "password", ignore = true)
     UserDTO toUserDTO(User user);
 
-    @Mapping(target = "role", qualifiedByName = "copyRoles")
+    @Mapping(target = "roles", qualifiedByName = "copyRoles")
     User toEntity(UserDTO userDTO);
 
     @Named("copyRoles")

@@ -1,6 +1,5 @@
 package com.sap.documentmgn.dto;
 
-import com.sap.documentmgn.entity.Document;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -18,18 +17,11 @@ public class DocumentVersionDTO {
     private LocalDateTime createdAt;
     private Long documentId;
 
-    public DocumentVersionDTO(Long id, String status){
+    public DocumentVersionDTO(Long id, String status) {
         this.id = id;
         this.status = status;
     }
 
-    public DocumentVersionDTO(Long id, Integer versionNumber, String content, String status, String createdByUsername, LocalDateTime createdAt, Long documentId) {
-        this.id = id;
-        this.versionNumber = versionNumber;
-        this.content = content;
-        this.status = status;
-        this.createdByUsername = createdByUsername;
-        this.createdAt = createdAt;
-        this.documentId = documentId;
+    public DocumentVersionDTO() {
     }
 }

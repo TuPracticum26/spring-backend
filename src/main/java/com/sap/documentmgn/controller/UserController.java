@@ -42,8 +42,9 @@ public class UserController {
 
     @PreAuthorize("hasRole('ADMIN') || hasRole('AUTHOR')")
     @DeleteMapping("/api/v1/admin/deleteDocument/{documentId}")
-    public ResponseEntity<?> deleteDocument(@PathVariable Long documentId) {
-        userService.deleteDocument(documentId);
+    public ResponseEntity<?> deleteDocument(@PathVariable Long documentId, @NonNull Principal principal) {
+        String username = principal.getName();
+        userService.deleteDocument(documentId, username);
         return ResponseEntity.ok().build();
     }
 }

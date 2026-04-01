@@ -22,6 +22,7 @@ import java.util.List;
 public class DocumentController {
     private final DocumentService documentService;
     private final DocumentVersionService documentVersionService;
+
     public DocumentController(DocumentService documentService, DocumentVersionService documentVersionService) {
         this.documentService = documentService;
         this.documentVersionService = documentVersionService;
@@ -30,14 +31,6 @@ public class DocumentController {
     @GetMapping
     public List<DocumentDTO> getDocuments() {
         return documentService.getDocuments();
-    }
-
-
-    @PostMapping("{docId}/versions/{versionNumber}/approve")
-    public ResponseEntity DocumentApprove(@PathVariable Long docId, @PathVariable Long versionNumber, Principal principal){
-        String username = principal.getName();
-        documentService.approveVersion(docId, versionNumber, username);
-        return ResponseEntity.ok().build();
     }
 
 

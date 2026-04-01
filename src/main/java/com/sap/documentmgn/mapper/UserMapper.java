@@ -12,8 +12,7 @@ import java.util.ArrayList;
 @Mapper(componentModel = "spring")
 public interface UserMapper {
 
-    @Mapping(target = "roles", qualifiedByName = "copyRoles")
-    @Mapping(target = "password", ignore = true)
+    @Mapping(target = "roles", qualifiedByName = "copyRoles") // roles, не role
     UserDTO toUserDTO(User user);
 
     @Mapping(target = "roles", qualifiedByName = "copyRoles")

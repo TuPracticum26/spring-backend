@@ -4,9 +4,14 @@ import com.sap.documentmgn.dto.DocumentHistoryDTO;
 import com.sap.documentmgn.dto.DocumentVersionDTO;
 import com.sap.documentmgn.entity.Document;
 import com.sap.documentmgn.entity.DocumentVersion;
+import com.sap.documentmgn.entity.ROLES;
+import com.sap.documentmgn.entity.User;
+import com.sap.documentmgn.mapper.DocumentVersionMapper;
 import com.sap.documentmgn.repository.DocumentRepository;
 import com.sap.documentmgn.repository.DocumentVersionRepository;
+import com.sap.documentmgn.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -14,36 +19,87 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class DocumentVersionService {
     private final DocumentVersionRepository documentVersionRepository;
+    private final UserRepository userRepository;
     private final DocumentRepository documentRepository;
+    private final DocumentVersionMapper documentVersionMapper;
+
+    public void approveVersion(Long docId, Long versionNumber, String username) {
+        Document document = documentRepository.findById(docId)
+                .orElseThrow(() -> {
+                    log.warn("Document with id {} not found", docId);
+                    return new ResponseStatusException(HttpStatus.NOT_FOUND, "Document not found");
+                });
+
+        DocumentVersion version = documentVersionRepository.findById(versionNumber)
+                .orElseThrow(() -> {
+                    log.warn("Version number {} not found", versionNumber);
+                    return new ResponseStatusException(HttpStatus.NOT_FOUND, "Version not found");
+                });
+
+        User user = userRepository.findByUsername(username);
+        if (user == null) {
+            log.warn("User with username {} not found", username);
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not found");
+        }
+        log.debug("User {} has roles {}", username, user.getRole());
+
+        if (!version.getDocument().getId().equals(document.getId())) {
+            log.warn("Version number {} does not belong to document with id {}", versionNumber, docId);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Version does not belong to the specified document");
+        }
+        if (!user.getRole().contains(ROLES.ADMIN) && !user.getRole().contains(ROLES.REVIEWER)) {
+            log.warn("User with username {} does not have permission to approve versions", username);
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User does not have permission to approve versions");
+        }
+        version.setStatus("approved");
+        version.updateEvent(user);
+
+        documentVersionRepository.save(version);
+        log.info("Version with id {} for document with id {} approved by user {}", versionNumber, docId, username);
+    }
 
     public DocumentVersionDTO rejectVersion(Long documentId, Long versionId) {
         DocumentVersion version = documentVersionRepository.findById(versionId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Version not found"));
+                .orElseThrow(() -> {
+                    log.warn("Version with id {} not found", versionId);
+                    return new ResponseStatusException(HttpStatus.NOT_FOUND, "Version not found");
+                });
         if (!version.getDocument().getId().equals(documentId)) {
+            log.warn("Version with id {} does not belong to document with id {}", versionId, documentId);
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Version does not belong to this document");
         }
         if (!version.getStatus().equals("DRAFT")) {
+            log.warn("Version with id {} has status {} and cannot be rejected", versionId, version.getStatus());
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Only DRAFT versions can be rejected");
         }
         version.setStatus("REJECTED");
 
         documentVersionRepository.save(version);
+        log.info("Version with id {} for document with id {} rejected", versionId, documentId);
 
         return new DocumentVersionDTO(version.getId(), version.getStatus());
 
     }
 
     public DocumentHistoryDTO getDocumentHistory(Long documentId){
+        log.info("Fetching document history for document with id {}", documentId);
+
         Document document = documentRepository.findById(documentId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Document not found with id: " + documentId));
+                .orElseThrow(() -> {
+                    log.warn("Document with id {} not found", documentId);
+                    return new ResponseStatusException(HttpStatus.NOT_FOUND, "Document not found with id: " + documentId);
+                });
         List<DocumentVersion> versions = documentVersionRepository
                 .findVersionWithCreatorByDocumentId(documentId);
+        log.debug("Found {} versions for document {}", versions.size(), documentId);
+
         List<DocumentVersionDTO> versionDTOs = versions.stream()
-                .map(this::convertToDTO)
+                .map(documentVersionMapper::toDocumentVersionDTO)
                 .collect(Collectors.toList());
         return new DocumentHistoryDTO(
                 document.getId(),
@@ -54,16 +110,19 @@ public class DocumentVersionService {
     }
 
     public DocumentHistoryDTO getDocumentHistorySummary(Long documentId){
+        log.info("Fetching document history summary for document with id {}", documentId);
+
         Document document = documentRepository.findById(documentId)
-                .orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Document not found with id: " + documentId));
+                .orElseThrow(()-> {
+                    log.warn("Document with id {} not found", documentId);
+                    return new ResponseStatusException(HttpStatus.NOT_FOUND, "Document not found with id: " + documentId);
+                });
         List<DocumentVersion> versions = documentVersionRepository
                 .findByDocumentIdOrderByVersionNumberAsc(documentId);
+        log.debug("Found {} versions for document {}", versions.size(), documentId);
+
         List<DocumentVersionDTO> versionDTOs = versions.stream()
-                .map(version -> {
-                    DocumentVersionDTO dto = convertToDTO(version);
-                    dto.setContent(null);
-                    return dto;
-                })
+                .map(documentVersionMapper::toDocumentVersionSummaryDTO)
                 .collect(Collectors.toList());
         return new DocumentHistoryDTO(
                 document.getId(),
@@ -74,28 +133,20 @@ public class DocumentVersionService {
     }
 
     public DocumentVersionDTO getSpecificVersion(Long documentId, Integer versionNumber){
+        log.info("Fetching version number {} for document with id {}", versionNumber, documentId);
+
         List<DocumentVersion> versions = documentVersionRepository
                 .findByDocumentIdOrderByVersionNumberAsc(documentId);
+        log.debug("Found {} versions for document {}", versions.size(), documentId);
+
         return versions.stream()
                 .filter(v -> v.getVersionNumber().equals(versionNumber))
                 .findFirst()
-                .map(this::convertToDTO)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        "Version " + versionNumber + " not found for document " + documentId));
-    }
-
-    private DocumentVersionDTO convertToDTO(DocumentVersion version) {
-        String createdByUsername = version.getCreatedBy() != null ?
-                version.getCreatedBy().getUsername() : null;
-
-        return new DocumentVersionDTO(
-                version.getId(),
-                version.getVersionNumber(),
-                version.getContent(),
-                version.getStatus(),
-                createdByUsername,
-                version.getCreatedAt(),
-                version.getDocument().getId()
-        );
+                .map(documentVersionMapper::toDocumentVersionDTO)
+                .orElseThrow(() -> {
+                    log.warn("Version number {} not found for document with id {}", versionNumber, documentId);
+                    return new ResponseStatusException(HttpStatus.NOT_FOUND,
+                            "Version " + versionNumber + " not found for document " + documentId);
+                });
     }
 }

@@ -17,7 +17,7 @@ public class Document {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank
+    @NotNull
     private String title;
 
     @NotBlank
@@ -25,7 +25,7 @@ public class Document {
     @JoinColumn(name = "author_id")
     private User author;
 
-    @NotBlank
+    @NotNull
     @Column(name = "created_at",updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 

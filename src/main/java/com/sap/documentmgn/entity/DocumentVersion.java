@@ -28,8 +28,8 @@ public class DocumentVersion {
     @Column(columnDefinition = "TEXT")
     private String content;
 
-    @NotBlank
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private VersionStatus status = VersionStatus.DRAFT;
 
     @NotBlank
     @ManyToOne

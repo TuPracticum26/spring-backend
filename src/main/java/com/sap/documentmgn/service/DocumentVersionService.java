@@ -2,10 +2,7 @@ package com.sap.documentmgn.service;
 
 import com.sap.documentmgn.dto.DocumentHistoryDTO;
 import com.sap.documentmgn.dto.DocumentVersionDTO;
-import com.sap.documentmgn.entity.Document;
-import com.sap.documentmgn.entity.DocumentVersion;
-import com.sap.documentmgn.entity.ROLES;
-import com.sap.documentmgn.entity.User;
+import com.sap.documentmgn.entity.*;
 import com.sap.documentmgn.mapper.DocumentVersionMapper;
 import com.sap.documentmgn.repository.DocumentRepository;
 import com.sap.documentmgn.repository.DocumentVersionRepository;
@@ -17,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -35,28 +33,30 @@ public class DocumentVersionService {
                     return new ResponseStatusException(HttpStatus.NOT_FOUND, "Document not found");
                 });
 
-        DocumentVersion version = documentVersionRepository.findById(versionNumber)
+        DocumentVersion version = documentVersionRepository
+                .findByDocumentIdAndVersionNumber(docId, versionNumber)
                 .orElseThrow(() -> {
-                    log.warn("Version number {} not found", versionNumber);
+                    log.warn("Version number {} not found for document {}", versionNumber, docId);
                     return new ResponseStatusException(HttpStatus.NOT_FOUND, "Version not found");
                 });
 
-        User user = userRepository.findByUsername(username);
-        if (user == null) {
-            log.warn("User with username {} not found", username);
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not found");
-        }
-        log.debug("User {} has roles {}", username, user.getRole());
+        Optional<User> userOpt = userRepository.findByUsername(username);
+        User user = userOpt.orElseThrow(() -> {
+            log.warn("Username {} not found", username);
+            return new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
+        });
+
+        log.debug("User {} has roles {}", username, user.getRoles());
 
         if (!version.getDocument().getId().equals(document.getId())) {
             log.warn("Version number {} does not belong to document with id {}", versionNumber, docId);
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Version does not belong to the specified document");
         }
-        if (!user.getRole().contains(ROLES.ADMIN) && !user.getRole().contains(ROLES.REVIEWER)) {
+        if (!user.getRoles().contains(ROLES.ADMIN) && !user.getRoles().contains(ROLES.REVIEWER)) {
             log.warn("User with username {} does not have permission to approve versions", username);
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User does not have permission to approve versions");
         }
-        version.setStatus("approved");
+        version.setStatus(VersionStatus.APPROVED);
         version.updateEvent(user);
 
         documentVersionRepository.save(version);
@@ -73,16 +73,16 @@ public class DocumentVersionService {
             log.warn("Version with id {} does not belong to document with id {}", versionId, documentId);
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Version does not belong to this document");
         }
-        if (!version.getStatus().equals("DRAFT")) {
+        if (version.getStatus() != VersionStatus.DRAFT) {
             log.warn("Version with id {} has status {} and cannot be rejected", versionId, version.getStatus());
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Only DRAFT versions can be rejected");
         }
-        version.setStatus("REJECTED");
+        version.setStatus(VersionStatus.REJECTED);
 
         documentVersionRepository.save(version);
         log.info("Version with id {} for document with id {} rejected", versionId, documentId);
 
-        return new DocumentVersionDTO(version.getId(), version.getStatus());
+        return documentVersionMapper.toDocumentVersionDTO(version);
 
     }
 

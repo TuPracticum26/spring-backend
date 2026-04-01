@@ -13,8 +13,12 @@ import org.springframework.stereotype.*;
 import org.springframework.web.server.ResponseStatusException;
 import java.util.List;
 import java.util.stream.Collectors;
-
+import com.sap.documentmgn.repository.UserRepository;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
+import com.sap.documentmgn.entity.VersionStatus;
+import com.sap.documentmgn.entity.User;
+
 
 @Slf4j
 @Service
@@ -23,6 +27,7 @@ public class DocumentService {
     private final DocumentRepository documentRepository;
     private final DocumentMapper documentMapper;
     private final DocumentVersionRepository documentVersionRepository;
+    private final UserRepository userRepository;
 
     public List<DocumentDTO> getDocuments() {
         List<Document> documents = documentRepository.findAll();
@@ -47,5 +52,28 @@ public class DocumentService {
 //        DocumentVersion latestVersion = documentVersionRepository.findTopByDocumentIdOrderByVersionNumberDesc(document.getId())
 //                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Document has no versions"));
         return dto;
+    }
+    @Transactional
+    public DocumentDTO createDocument(DocumentDTO documentDTO, String username) {
+        User author = userRepository.findByUsername(username)
+                .orElseThrow(() -> {
+                    log.warn("Author with username {} not found", username);
+                    return new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
+                });
+        Document document = new Document();
+        document.setTitle(documentDTO.getTitle());
+        document.setAuthor(author);
+        document = documentRepository.save(document);
+        DocumentVersion firstVersion = new DocumentVersion();
+        firstVersion.setDocument(document);
+        firstVersion.setVersionNumber(1);
+        firstVersion.setContent(documentDTO.getContent());
+        firstVersion.setStatus(VersionStatus.DRAFT);
+        firstVersion.updateEvent(author);
+        documentVersionRepository.save(firstVersion);
+        log.info("Created new document with id {} and initial version 1 by author {}", document.getId(), username);
+        DocumentDTO createdDto = documentMapper.toDocumentDTO(document);
+        createdDto.setContent(firstVersion.getContent());
+        return createdDto;
     }
 }

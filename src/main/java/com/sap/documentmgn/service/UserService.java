@@ -12,6 +12,9 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import com.sap.documentmgn.dto.RegisterRequest;
+import com.sap.documentmgn.dto.UserResponse;
+import com.sap.documentmgn.enums.Role;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -23,6 +26,22 @@ public class UserService{
     private final UserRepository userRepository;
     private final DocumentRepository documentRepository;
     private final UserMapper userMapper;
+
+
+    public UserResponse register(RegisterRequest request){
+        User user = new User();
+        user.setUsername(request.getUsername());
+        user.setPassword(request.getPassword());
+
+        user.addRole(ROLES.READER);
+        User savedUser = userRepository.save(user);
+
+        return new UserResponse(
+                savedUser.getId(),
+                savedUser.getUsername(),
+                savedUser.getRole()
+        );
+    }
 
     @PreAuthorize("hasRole('ADMIN')")
     public List<UserDTO> getUsers() {

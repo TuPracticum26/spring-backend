@@ -17,26 +17,27 @@ public class DocumentVersion {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank
+    @NotNull
     @ManyToOne
     @JoinColumn(name = "document_id")
     private Document document;
 
-    @NotBlank
+    @NotNull
     private Integer versionNumber;
 
     @Column(columnDefinition = "TEXT")
     private String content;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "status", length = 20)
     private VersionStatus status = VersionStatus.DRAFT;
 
-    @NotBlank
+    @NotNull
     @ManyToOne
     @JoinColumn(name = "created_by_id")
     private User createdBy;
 
-    @NotBlank
+    @NotNull
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 

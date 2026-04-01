@@ -1,5 +1,6 @@
 package com.sap.documentmgn.service;
 
+import com.sap.documentmgn.entity.ROLES;
 import com.sap.documentmgn.entity.User;
 import com.sap.documentmgn.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -17,14 +18,19 @@ public class CustomUserDetailService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByUsername(username);
-        if (user == null){
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not found");
-        }
+        // findByUsername вече връща Optional<User>
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not found"));
+
+        String[] rolesArray = user.getRoles()
+                .stream()
+                .map(ROLES::name)
+                .toArray(String[]::new);
+
         return org.springframework.security.core.userdetails.User.builder()
                 .username(user.getUsername())
                 .password(user.getPassword())
-                .roles(user.getRole().toArray(new String[0]))
+                .roles(rolesArray)
                 .build();
     }
 }

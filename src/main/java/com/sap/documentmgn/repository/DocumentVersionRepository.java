@@ -18,4 +18,7 @@ public interface DocumentVersionRepository extends JpaRepository<DocumentVersion
             "WHERE dv.document.id = :documentId " +
             "ORDER BY dv.versionNumber ASC")
     List<DocumentVersion> findVersionWithCreatorByDocumentId(@Param("documentId") Long documentId);
+
+    Optional<DocumentVersion> findByDocumentIdAndVersionNumber(Long documentId, Long versionNumber);
+
 }

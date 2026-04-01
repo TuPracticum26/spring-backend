@@ -27,15 +27,19 @@ public class User {
     @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[!@#$%^&*()_+\\-={}\\[\\]:;\"'<>,.?/])[A-Za-z\\d!@#$%^&*()_+\\-={}\\[\\]:;\"'<>,.?/]+$", message = "Password must contain at least 1 letter, 1 number, and 1 special character!")
     private String password;
 
-    @NotBlank
-    private List<ROLES> role;
+    @NotEmpty(message="User must have at least one role.")
+    @ElementCollection(targetClass = ROLES.class)
+    @Enumerated(EnumType.STRING)
+    @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
+    @Column(name = "role")
+    private List<ROLES> roles = new ArrayList<>();
 
     public void addRole(ROLES role) {
-        if (this.role == null) {
-            this.role = new ArrayList<>();
+        if (this.roles == null) {
+            this.roles = new ArrayList<>();
         }
-        if (!this.role.contains(role)) {
-            this.role.add(role);
+        if (!this.roles.contains(role)) {
+            this.roles.add(role);
         }
     }
 }

@@ -33,12 +33,9 @@ public class UserService{
     }
 
     public void setRole(Long userId, ROLES role, String adminUsername) {
-        User admin = userRepository.findByUsername(adminUsername);
-
-        if (!role.equals(ROLES.ADMIN) && !role.equals(ROLES.AUTHOR) && !role.equals(ROLES.REVIEWER) && !role.equals(ROLES.READER)) {
-            log.warn("Invalid role {} provided by admin {}", role, adminUsername);
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Invalid Role");
-        }
+        Optional<User> adminOpt = userRepository.findByUsername(adminUsername);
+        User admin = adminOpt.orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "Admin not found!"));
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> {

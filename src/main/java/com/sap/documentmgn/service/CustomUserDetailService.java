@@ -3,6 +3,7 @@ package com.sap.documentmgn.service;
 import com.sap.documentmgn.entity.ROLES;
 import com.sap.documentmgn.entity.User;
 import com.sap.documentmgn.repository.UserRepository;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -17,6 +18,7 @@ public class CustomUserDetailService implements UserDetailsService {
     private final UserRepository userRepository;
 
     @Override
+    @Transactional(readOnly = true) //<-- Оправи автентикацията
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         // findByUsername вече връща Optional<User>
         User user = userRepository.findByUsername(username)

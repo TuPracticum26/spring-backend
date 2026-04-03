@@ -69,6 +69,28 @@ INSERT INTO document_versions(id, document_id, version_number, content, status, 
 (13, 10, 1, 'Initial content for document 10', 'DRAFT', 2, '2026-02-04 09:00:00');
 
 -- ====================================================
+-- version_comments table
+-- ====================================================
+INSERT INTO version_comments(version_id, comment) VALUES
+(1, 'Initial draft created for review'),
+(2, 'Updated introduction section'),
+(2, 'Fixed formatting issues'),
+(3, 'First version submitted'),
+(4, 'All sections reviewed and approved'),
+(4, 'Compliance check passed'),
+(5, 'Draft pending team review'),
+(6, 'Rejected due to missing references'),
+(6, 'Content does not meet style guidelines'),
+(7, 'Awaiting manager sign-off'),
+(8, 'Pending legal review'),
+(9, 'Approved after final revision'),
+(10, 'Work in progress'),
+(11, 'Under review by senior editor'),
+(12, 'Approved with minor notes'),
+(12, 'Archived for compliance records'),
+(13, 'Initial draft, not yet reviewed');
+
+-- ====================================================
 -- Re-enable foreign key checks
 -- ====================================================
 SET FOREIGN_KEY_CHECKS=1;

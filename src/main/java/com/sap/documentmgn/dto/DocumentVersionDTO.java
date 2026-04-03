@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -16,6 +17,7 @@ public class DocumentVersionDTO {
     private String createdByUsername;
     private LocalDateTime createdAt;
     private Long documentId;
+    private List<String> comments;
 
     public DocumentVersionDTO(Long id, String status) {
         this.id = id;

@@ -10,9 +10,11 @@ import com.sap.documentmgn.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -148,5 +150,29 @@ public class DocumentVersionService {
                     return new ResponseStatusException(HttpStatus.NOT_FOUND,
                             "Version " + versionNumber + " not found for document " + documentId);
                 });
+    }
+
+    public  List<String> getComments(Long docId, Long verId) {
+        DocumentVersion documentVersion = documentVersionRepository
+                .findByDocumentIdAndVersionNumber(docId, verId)
+                .orElseThrow(() -> {
+                    return new ResponseStatusException(HttpStatus.NOT_FOUND, "Document version not found with id: " + verId);
+                });
+        return documentVersion.getComments();
+    }
+
+    public void postComment(Long docId, Long verId, String comment) {
+        DocumentVersion documentVersion = documentVersionRepository
+                .findByDocumentIdAndVersionNumber(docId, verId)
+                   .orElseThrow(() -> {
+                       return new ResponseStatusException(HttpStatus.NOT_FOUND, "Document version not found with id: " + verId);
+                   });
+
+        comment = comment.trim();
+        if (!comment.isEmpty()) {
+            documentVersion.getComments().add(comment);
+            documentVersionRepository.save(documentVersion);
+        }
+
     }
 }

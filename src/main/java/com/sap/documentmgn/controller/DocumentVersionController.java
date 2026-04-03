@@ -4,12 +4,10 @@ import com.sap.documentmgn.dto.DocumentVersionDTO;
 import com.sap.documentmgn.service.DocumentService;
 import com.sap.documentmgn.service.DocumentVersionService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/documents")
@@ -32,5 +30,16 @@ public class DocumentVersionController {
     @PostMapping("/{docId}/versions/{verId}/reject")
     public DocumentVersionDTO rejectVersion(@PathVariable Long docId, @PathVariable Long verId) {
         return documentVersionService.rejectVersion(docId, verId);
+    }
+
+    @GetMapping("/{docId}/versions/{verId}/comments")
+    public List<String> postComment(@PathVariable Long docId, @PathVariable Long verId) {
+        return documentVersionService.getComments(docId, verId);
+    }
+
+    @PostMapping("/{docId}/versions/{verId}/comments")
+    public ResponseEntity<?> postComment(@PathVariable Long docId, @PathVariable Long verId, @RequestBody String comment) {
+        documentVersionService.postComment(docId, verId, comment);
+        return ResponseEntity.ok().build();
     }
 }

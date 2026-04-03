@@ -76,7 +76,12 @@ public class UserService{
                     log.warn("Document with id {} not found", documentId);
                     return new ResponseStatusException(HttpStatus.NOT_FOUND, "Document not found");
                 });
-        if (!document.getAuthor().getUsername().equals(username)) {
+
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> {
+                    return new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
+                });
+        if (!document.getAuthor().getUsername().equals(username) && !user.getRoles().contains(ROLES.ADMIN)) {
             log.warn("User with username {} attempted to delete document with id {} created by {}", username, documentId, document.getAuthor().getUsername());
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You can only delete documents you created");
         }

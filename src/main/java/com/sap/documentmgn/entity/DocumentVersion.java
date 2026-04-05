@@ -6,6 +6,8 @@ import lombok.Setter;
 import jakarta.validation.constraints.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -17,28 +19,34 @@ public class DocumentVersion {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank
+    @NotNull
     @ManyToOne
     @JoinColumn(name = "document_id")
     private Document document;
 
-    @NotBlank
+    @NotNull
     private Integer versionNumber;
 
     @Column(columnDefinition = "TEXT")
     private String content;
 
-    @NotBlank
-    private String status;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", length = 20)
+    private VersionStatus status = VersionStatus.DRAFT;
 
-    @NotBlank
+    @NotNull
     @ManyToOne
     @JoinColumn(name = "created_by_id")
     private User createdBy;
 
-    @NotBlank
+    @NotNull
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
+
+    @ElementCollection
+    @CollectionTable(name = "version_comments", joinColumns = @JoinColumn(name = "version_id"))
+    @Column(name = "comment", columnDefinition = "TEXT")
+    private List<String> comments = new ArrayList<>();
 
     public void updateEvent(User user) {
         this.createdBy = user;

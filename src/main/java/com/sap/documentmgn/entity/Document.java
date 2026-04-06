@@ -17,10 +17,10 @@ public class Document {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotNull
+    @NotBlank
     private String title;
 
-    @NotBlank
+    @NotNull
     @ManyToOne
     @JoinColumn(name = "author_id")
     private User author;

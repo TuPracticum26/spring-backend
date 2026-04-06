@@ -45,6 +45,7 @@ public class DocumentController {
 
 
     //Взема пълна история на документ
+    @PreAuthorize("hasAnyRole('ADMIN', 'AUTHOR', 'REVIEWER')")
     @GetMapping("/{docId}/history")
     public ResponseEntity<DocumentHistoryDTO> getDocumentHistory(@PathParam("docId") @PathVariable Long docId){
         DocumentHistoryDTO history = documentVersionService.getDocumentHistory(docId);
@@ -52,6 +53,7 @@ public class DocumentController {
     }
 
     //Взема само summary на историята
+    @PreAuthorize("hasAnyRole('ADMIN', 'AUTHOR', 'REVIEWER')")
     @GetMapping("/{docId}/history/summary")
     public ResponseEntity<DocumentHistoryDTO> getDocumentHistorySummary(@PathParam("docId") @PathVariable Long docId){
         DocumentHistoryDTO history = documentVersionService.getDocumentHistorySummary(docId);
@@ -59,6 +61,7 @@ public class DocumentController {
     }
 
     //Взема версия по номер
+    @PreAuthorize("hasAnyRole('ADMIN', 'AUTHOR', 'REVIEWER')")
     @GetMapping("/{docId}/versions/num/{versionNumber}")
     public ResponseEntity<DocumentVersionDTO> getDocumentVersionByNumber(@PathParam("docId") @PathVariable Long docId, @PathParam("versionNumber") @PathVariable Integer versionNumber){
         DocumentVersionDTO version = documentVersionService.getSpecificVersion(docId, versionNumber);

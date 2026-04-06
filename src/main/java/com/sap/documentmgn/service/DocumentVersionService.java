@@ -29,12 +29,6 @@ public class DocumentVersionService {
     private final DocumentVersionMapper documentVersionMapper;
 
     public void approveVersion(Long docId, Long versionNumber, String username) {
-        Document document = documentRepository.findById(docId)
-                .orElseThrow(() -> {
-                    log.warn("Document with id {} not found", docId);
-                    return new ResponseStatusException(HttpStatus.NOT_FOUND, "Document not found");
-                });
-
         DocumentVersion version = documentVersionRepository
                 .findByDocumentIdAndVersionNumber(docId, versionNumber)
                 .orElseThrow(() -> {
@@ -42,47 +36,41 @@ public class DocumentVersionService {
                     return new ResponseStatusException(HttpStatus.NOT_FOUND, "Version not found");
                 });
 
-        Optional<User> userOpt = userRepository.findByUsername(username);
-        User user = userOpt.orElseThrow(() -> {
+//        Optional<User> userOpt = userRepository.findByUsername(username);
+        User user = userRepository.findByUsername(username).orElseThrow(() -> {
             log.warn("Username {} not found", username);
             return new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
         });
 
         log.debug("User {} has roles {}", username, user.getRoles());
 
-        if (!version.getDocument().getId().equals(document.getId())) {
-            log.warn("Version number {} does not belong to document with id {}", versionNumber, docId);
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Version does not belong to the specified document");
-        }
-        if (!user.getRoles().contains(ROLES.ADMIN) && !user.getRoles().contains(ROLES.REVIEWER)) {
-            log.warn("User with username {} does not have permission to approve versions", username);
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User does not have permission to approve versions");
+        if (version.getStatus() != VersionStatus.DRAFT) {
+            log.warn("Version number {} for document with id {} has status {} and cannot be approved", versionNumber, docId, version.getStatus());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Only DRAFT versions can be approved");
         }
         version.setStatus(VersionStatus.APPROVED);
         version.updateEvent(user);
 
         documentVersionRepository.save(version);
-        log.info("Version with id {} for document with id {} approved by user {}", versionNumber, docId, username);
+        log.info("Version number {} for document with id {} approved by user {}", versionNumber, docId, username);
     }
 
-    public DocumentVersionDTO rejectVersion(Long documentId, Long versionId) {
-        DocumentVersion version = documentVersionRepository.findById(versionId)
+    public DocumentVersionDTO rejectVersion(Long docId, Long versionNumber) {
+        DocumentVersion version = documentVersionRepository
+                .findByDocumentIdAndVersionNumber(docId,versionNumber)
                 .orElseThrow(() -> {
-                    log.warn("Version with id {} not found", versionId);
+                    log.warn("Version with id {} not found", versionNumber);
                     return new ResponseStatusException(HttpStatus.NOT_FOUND, "Version not found");
                 });
-        if (!version.getDocument().getId().equals(documentId)) {
-            log.warn("Version with id {} does not belong to document with id {}", versionId, documentId);
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Version does not belong to this document");
-        }
+
         if (version.getStatus() != VersionStatus.DRAFT) {
-            log.warn("Version with id {} has status {} and cannot be rejected", versionId, version.getStatus());
+            log.warn("Version number {} has status {} and cannot be rejected", versionNumber, version.getStatus());
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Only DRAFT versions can be rejected");
         }
         version.setStatus(VersionStatus.REJECTED);
 
         documentVersionRepository.save(version);
-        log.info("Version with id {} for document with id {} rejected", versionId, documentId);
+        log.info("Version number {} for document with id {} rejected", versionNumber, docId);
 
         return documentVersionMapper.toDocumentVersionDTO(version);
 

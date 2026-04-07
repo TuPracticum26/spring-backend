@@ -12,8 +12,8 @@ public class UserRegistrationDTO {
 
     @NotBlank(message = "Password is required")
     @Pattern(
-            regexp = "^(?=.*[A-Za-z])(?=.*\\d).{8,}$",
-            message = "Password must contain at least 8 characters, one letter and one number"
+            regexp = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[!@#$%^&*()_+\\-={}\\[\\]:;\"'<>,.?/])[A-Za-z\\d!@#$%^&*()_+\\-={}\\[\\]:;\"'<>,.?/]+$",
+            message = "Password must contain at least one letter, one number and one special character."
     )
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;

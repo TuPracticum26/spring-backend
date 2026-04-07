@@ -1,5 +1,6 @@
 package com.sap.documentmgn.service;
 import com.sap.documentmgn.dto.UserDTO;
+import com.sap.documentmgn.dto.UserRegistrationDTO;
 import com.sap.documentmgn.entity.Document;
 import com.sap.documentmgn.entity.ROLES;
 import com.sap.documentmgn.entity.User;
@@ -10,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -23,6 +25,7 @@ public class UserService{
     private final UserRepository userRepository;
     private final DocumentRepository documentRepository;
     private final UserMapper userMapper;
+    private final PasswordEncoder passwordEncoder;
 
     @PreAuthorize("hasRole('ADMIN')")
     public List<UserDTO> getUsers() {
@@ -88,5 +91,16 @@ public class UserService{
 
         documentRepository.delete(document);
         log.info("Document with id {} deleted", documentId);
+    }
+
+    public UserDTO registerUser(UserRegistrationDTO registrationDTO) {
+        User user = new User();
+        user.setUsername(registrationDTO.getUsername());
+        user.setPassword(passwordEncoder.encode(registrationDTO.getPassword()));
+        user.addRole(ROLES.READER);
+
+        User savedUser = userRepository.save(user);
+
+        return userMapper.toUserDTO(savedUser);
     }
 }

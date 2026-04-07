@@ -3,15 +3,18 @@ package com.sap.documentmgn.controller;
 import com.sap.documentmgn.dto.UserDTO;
 import com.sap.documentmgn.entity.ROLES;
 import com.sap.documentmgn.service.UserService;
+import jakarta.validation.constraints.Min;
 import org.jspecify.annotations.NonNull;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.util.List;
 
 @RestController
+@Validated
 public class UserController {
     private final UserService userService;
 
@@ -26,7 +29,7 @@ public class UserController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/api/v1/admin/setRole/{userId}/{role}")
-    public ResponseEntity<?> setRole(@PathVariable Long userId, @PathVariable ROLES role, @NonNull Principal principal) {
+    public ResponseEntity<?> setRole(@PathVariable @Min(1) Long userId, @PathVariable ROLES role, @NonNull Principal principal) {
         String adminUsername = principal.getName();
         userService.setRole(userId, role, adminUsername);
         return ResponseEntity.ok().build();
@@ -34,7 +37,7 @@ public class UserController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/api/v1/admin/deleteUser/{userId}")
-    public ResponseEntity<?> deleteUser(@PathVariable Long userId, @NonNull Principal principal) {
+    public ResponseEntity<?> deleteUser(@PathVariable @Min(1) Long userId, @NonNull Principal principal) {
         String adminUsername = principal.getName();
         userService.deleteUser(userId, adminUsername);
         return ResponseEntity.ok().build();
@@ -42,7 +45,7 @@ public class UserController {
 
     @PreAuthorize("hasRole('ADMIN') || hasRole('AUTHOR')")
     @DeleteMapping("/api/v1/deleteDocument/{documentId}")
-    public ResponseEntity<?> deleteDocument(@PathVariable Long documentId, @NonNull Principal principal) {
+    public ResponseEntity<?> deleteDocument(@PathVariable @Min(1) Long documentId, @NonNull Principal principal) {
         String username = principal.getName();
         userService.deleteDocument(documentId, username);
         return ResponseEntity.ok().build();

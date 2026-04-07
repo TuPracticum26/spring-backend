@@ -27,7 +27,9 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth->
                         auth.requestMatchers("/api/v1/auth/**").permitAll()
                                 .anyRequest().authenticated())
-                .httpBasic(basic -> basic.disable());
+//                .httpBasic(basic -> basic.disable()); ==  Нито един HTTP Метод не работи заради този ред
+                    .httpBasic(Customizer.withDefaults());
+
         return http.build();
     }
 

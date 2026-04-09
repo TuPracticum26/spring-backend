@@ -1,4 +1,5 @@
 package com.sap.documentmgn.service;
+
 import com.sap.documentmgn.dto.UserDTO;
 import com.sap.documentmgn.dto.UserRegistrationDTO;
 import com.sap.documentmgn.entity.Document;
@@ -9,13 +10,14 @@ import com.sap.documentmgn.repository.DocumentRepository;
 import com.sap.documentmgn.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -27,7 +29,7 @@ public class UserService{
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
 
-    @PreAuthorize("hasRole('ADMIN')")
+//    @PreAuthorize("hasRole('ADMIN')")
     public List<UserDTO> getUsers() {
         log.info("Fetching all users from the database");
 
@@ -56,7 +58,7 @@ public class UserService{
         log.info("Admin {} set role {} for user {}", adminUsername, role, user.getUsername());
     }
 
-    public void deleteUser(Long userId, String adminUsername) {
+    public void deleteUser(Long userId, String initUsername) {
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> {
@@ -64,13 +66,24 @@ public class UserService{
                     return new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
                 });
 
-        if (user.getUsername().equals(adminUsername)) {
-            log.warn("Admin {} attempted to delete their own account", adminUsername);
+        User initUser = userRepository.findByUsername(initUsername)
+                .orElseThrow(() -> {
+                    log.warn("User with id {} not found", initUsername);
+                    return new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
+                });
+
+        if (user.getUsername().equals(initUsername) && user.getRoles().contains(ROLES.ADMIN)) {
+            log.warn("Admin {} attempted to delete their own account", initUsername);
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot delete your admin account");
         }
 
+        if (!user.getUsername().equals((initUsername)) && !initUser.getRoles().contains(ROLES.ADMIN)) {
+            log.warn("{} attempted to delete another account", initUsername);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Only an admin account can delete other accounts");
+        }
+
         userRepository.delete(user);
-        log.info("Admin {} deleted user {}", adminUsername, user.getUsername());
+        log.info("Admin {} deleted user {}", initUsername, user.getUsername());
     }
 
     public void deleteDocument(Long documentId, String username) {

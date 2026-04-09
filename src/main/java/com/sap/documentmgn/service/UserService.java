@@ -29,7 +29,7 @@ public class UserService{
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
 
-//    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public List<UserDTO> getUsers() {
         log.info("Fetching all users from the database");
 
@@ -83,7 +83,7 @@ public class UserService{
         }
 
         userRepository.delete(user);
-        log.info("Admin {} deleted user {}", initUsername, user.getUsername());
+        log.info("{} deleted user {}", initUsername, user.getUsername());
     }
 
     public void deleteDocument(Long documentId, String username) {

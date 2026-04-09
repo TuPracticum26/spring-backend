@@ -37,8 +37,8 @@ public class UserController {
 
     @DeleteMapping("/api/v1/admin/deleteUser/{userId}")
     public ResponseEntity<?> deleteUser(@PathVariable @Min(1) Long userId, @NonNull Principal principal) {
-        String username = principal.getName();
-        userService.deleteUser(userId, username);
+        String initUsername = principal.getName();
+        userService.deleteUser(userId, initUsername);
         return ResponseEntity.ok().build();
     }
 

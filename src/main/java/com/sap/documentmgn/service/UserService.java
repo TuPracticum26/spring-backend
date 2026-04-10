@@ -116,4 +116,10 @@ public class UserService{
 
         return userMapper.toUserDTO(savedUser);
     }
+
+    public UserDTO getUserByUsername(String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+        return userMapper.toUserDTO(user);
+    }
 }

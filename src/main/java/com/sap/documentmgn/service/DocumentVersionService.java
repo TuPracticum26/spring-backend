@@ -1,7 +1,9 @@
 package com.sap.documentmgn.service;
 
 import com.sap.documentmgn.dto.DocumentHistoryDTO;
+import com.sap.documentmgn.dto.DocumentHistorySummaryDTO;
 import com.sap.documentmgn.dto.DocumentVersionDTO;
+import com.sap.documentmgn.dto.DocumentVersionSummaryDTO;
 import com.sap.documentmgn.entity.*;
 import com.sap.documentmgn.mapper.DocumentVersionMapper;
 import com.sap.documentmgn.repository.DocumentRepository;
@@ -99,7 +101,7 @@ public class DocumentVersionService {
         );
     }
 
-    public DocumentHistoryDTO getDocumentHistorySummary(Long documentId){
+    public DocumentHistorySummaryDTO getDocumentHistorySummary(Long documentId){
         log.info("Fetching document history summary for document with id {}", documentId);
 
         Document document = documentRepository.findById(documentId)
@@ -111,10 +113,10 @@ public class DocumentVersionService {
                 .findByDocumentIdOrderByVersionNumberAsc(documentId);
         log.debug("Found {} versions for document {}", versions.size(), documentId);
 
-        List<DocumentVersionDTO> versionDTOs = versions.stream()
-                .map(documentVersionMapper::toDocumentVersionSummaryDTO)
+        List<DocumentVersionSummaryDTO> versionDTOs = versions.stream()
+                .map(documentVersionMapper::toSummaryDTO)
                 .collect(Collectors.toList());
-        return new DocumentHistoryDTO(
+        return new DocumentHistorySummaryDTO(
                 document.getId(),
                 document.getTitle(),
                 versionDTOs,

@@ -5,7 +5,7 @@ SET FOREIGN_KEY_CHECKS=0;
 
 -- ====================================================
 -- Users
--- ====================================================
+
 INSERT INTO users(id, username, password) VALUES
 (1, 'Georgi Goshenkov', '$2y$10$AdCe8GASmz2GcFp7vyTg1.ZRlr7CKGmG2toIa2FOqaSFWoc6aUpcW'),
 (2, 'Stefan Stefanov', '$2y$10$1VawqRd2Jsgh2H7DUW14TOUj1Ta9IGZUg3w5q1h5ftuE5cs0K.ZM.'),
@@ -23,17 +23,17 @@ INSERT INTO users(id, username, password) VALUES
 -- User Roles
 -- ====================================================
 INSERT INTO user_roles(user_id, role) VALUES
-(1, 'Admin'),
-(2, 'Author'),
-(3, 'Author'),
-(4, 'Author'),
-(5, 'Author'),
-(6, 'Author'),
-(7, 'Reviewer'),
-(8, 'Reviewer'),
-(9, 'Reviewer'),
-(10, 'Reader'),
-(11, 'Reader');
+(1, 'ADMIN'),
+(2, 'AUTHOR'),
+(3, 'AUTHOR'),
+(4, 'AUTHOR'),
+(5, 'AUTHOR'),
+(6, 'AUTHOR'),
+(7, 'REVIEWER'),
+(8, 'REVIEWER'),
+(9, 'REVIEWER'),
+(10, 'READER'),
+(11, 'READER');
 
 -- ====================================================
 -- Documents

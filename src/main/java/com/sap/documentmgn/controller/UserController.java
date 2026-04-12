@@ -28,10 +28,10 @@ public class UserController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping("/api/v1/admin/setRole/{userId}/{role}")
-    public ResponseEntity<?> setRole(@PathVariable @Min(1) Long userId, @PathVariable ROLES role, @NonNull Principal principal) {
+    @PutMapping("/api/v1/admin/setRole/{userId}")
+    public ResponseEntity<?> setRole(@PathVariable @Min(1) Long userId, @RequestBody List<ROLES> roles, @NonNull Principal principal) {
         String adminUsername = principal.getName();
-        userService.setRole(userId, role, adminUsername);
+        userService.setRole(userId, roles, adminUsername);
         return ResponseEntity.ok().build();
     }
 

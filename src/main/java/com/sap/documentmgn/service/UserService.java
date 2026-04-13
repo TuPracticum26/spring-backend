@@ -37,7 +37,7 @@ public class UserService{
         return users.stream().map(userMapper::toUserDTO).collect(Collectors.toList());
     }
 
-    public void setRole(Long userId, ROLES role, String adminUsername) {
+    public void setRole(Long userId, List<ROLES> roles, String adminUsername) {
         Optional<User> adminOpt = userRepository.findByUsername(adminUsername);
         User admin = adminOpt.orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND, "Admin not found!"));
@@ -53,9 +53,9 @@ public class UserService{
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot change your own role");
         }
 
-        user.addRole(role);
+        user.setRoles(roles);
         userRepository.save(user);
-        log.info("Admin {} set role {} for user {}", adminUsername, role, user.getUsername());
+        log.info("Admin {} set roles {} for user {}", adminUsername, roles, user.getUsername());
     }
 
     public void deleteUser(Long userId, String initUsername) {
@@ -115,5 +115,11 @@ public class UserService{
         User savedUser = userRepository.save(user);
 
         return userMapper.toUserDTO(savedUser);
+    }
+
+    public UserDTO getUserByUsername(String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+        return userMapper.toUserDTO(user);
     }
 }

@@ -54,7 +54,7 @@ INSERT INTO documents(id, title, author_id, created_at) VALUES
 -- Document Versions
 -- ====================================================
 INSERT INTO document_versions(id, document_id, version_number, content, status, created_by_id, created_at) VALUES
-(1, 1, 1, 'Initial content for document 1', 'DRAFT', 2, '2026-01-26 09:00:00'),
+(1, 1, 1, 'Initial content for document 1', 'REJECTED', 2, '2026-01-26 09:00:00'),
 (2, 1, 2, 'Revised content for document 1', 'PENDING', 2, '2026-01-27 10:00:00'),
 (3, 2, 1, 'Initial content for document 2', 'DRAFT', 3, '2026-01-27 09:00:00'),
 (4, 2, 2, 'Revised content for document 2', 'APPROVED', 3, '2026-01-28 11:00:00'),
@@ -66,7 +66,7 @@ INSERT INTO document_versions(id, document_id, version_number, content, status, 
 (10, 7, 1, 'Initial content for document 7', 'DRAFT', 5, '2026-02-01 09:00:00'),
 (11, 8, 1, 'Initial content for document 8', 'PENDING', 4, '2026-02-02 09:00:00'),
 (12, 9, 1, 'Initial content for document 9', 'APPROVED', 3, '2026-02-03 09:00:00'),
-(13, 10, 1, 'Initial content for document 10', 'DRAFT', 2, '2026-02-04 09:00:00');
+(13, 10, 1, 'Initial content for document 10', 'APPROVED', 2, '2026-02-04 09:00:00');
 
 -- ====================================================
 -- version_comments table

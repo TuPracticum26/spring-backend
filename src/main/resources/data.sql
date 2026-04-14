@@ -5,7 +5,7 @@ SET FOREIGN_KEY_CHECKS=0;
 
 -- ====================================================
 -- Users
--- ====================================================
+
 INSERT INTO users(id, username, password) VALUES
 (1, 'Georgi Goshenkov', '$2y$10$AdCe8GASmz2GcFp7vyTg1.ZRlr7CKGmG2toIa2FOqaSFWoc6aUpcW'),
 (2, 'Stefan Stefanov', '$2y$10$1VawqRd2Jsgh2H7DUW14TOUj1Ta9IGZUg3w5q1h5ftuE5cs0K.ZM.'),
@@ -23,17 +23,17 @@ INSERT INTO users(id, username, password) VALUES
 -- User Roles
 -- ====================================================
 INSERT INTO user_roles(user_id, role) VALUES
-(1, 'Admin'),
-(2, 'Author'),
-(3, 'Author'),
-(4, 'Author'),
-(5, 'Author'),
-(6, 'Author'),
-(7, 'Reviewer'),
-(8, 'Reviewer'),
-(9, 'Reviewer'),
-(10, 'Reader'),
-(11, 'Reader');
+(1, 'ADMIN'),
+(2, 'AUTHOR'),
+(3, 'AUTHOR'),
+(4, 'AUTHOR'),
+(5, 'AUTHOR'),
+(6, 'AUTHOR'),
+(7, 'REVIEWER'),
+(8, 'REVIEWER'),
+(9, 'REVIEWER'),
+(10, 'READER'),
+(11, 'READER');
 
 -- ====================================================
 -- Documents
@@ -54,7 +54,7 @@ INSERT INTO documents(id, title, author_id, created_at) VALUES
 -- Document Versions
 -- ====================================================
 INSERT INTO document_versions(id, document_id, version_number, content, status, created_by_id, created_at) VALUES
-(1, 1, 1, 'Initial content for document 1', 'DRAFT', 2, '2026-01-26 09:00:00'),
+(1, 1, 1, 'Initial content for document 1', 'REJECTED', 2, '2026-01-26 09:00:00'),
 (2, 1, 2, 'Revised content for document 1', 'PENDING', 2, '2026-01-27 10:00:00'),
 (3, 2, 1, 'Initial content for document 2', 'DRAFT', 3, '2026-01-27 09:00:00'),
 (4, 2, 2, 'Revised content for document 2', 'APPROVED', 3, '2026-01-28 11:00:00'),
@@ -66,7 +66,7 @@ INSERT INTO document_versions(id, document_id, version_number, content, status, 
 (10, 7, 1, 'Initial content for document 7', 'DRAFT', 5, '2026-02-01 09:00:00'),
 (11, 8, 1, 'Initial content for document 8', 'PENDING', 4, '2026-02-02 09:00:00'),
 (12, 9, 1, 'Initial content for document 9', 'APPROVED', 3, '2026-02-03 09:00:00'),
-(13, 10, 1, 'Initial content for document 10', 'DRAFT', 2, '2026-02-04 09:00:00');
+(13, 10, 1, 'Initial content for document 10', 'APPROVED', 2, '2026-02-04 09:00:00');
 
 -- ====================================================
 -- version_comments table

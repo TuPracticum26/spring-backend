@@ -1,5 +1,6 @@
 package com.sap.documentmgn.controller;
 
+import com.sap.documentmgn.dto.DocumentVersionDTO;
 import com.sap.documentmgn.dto.UserDTO;
 import com.sap.documentmgn.entity.ROLES;
 import com.sap.documentmgn.service.UserService;
@@ -30,6 +31,11 @@ public class UserController {
     @GetMapping("/api/v1/users/{page}")
     public List<UserDTO> getUsersByTen(@PathVariable int page){
         return userService.getUsersByTen(page);
+    }
+
+    @GetMapping("/api/v1/users/{userId}/versions")
+    public List<DocumentVersionDTO> getAllUserVersions(@PathVariable Long userId) {
+        return userService.getAllUserVersions(userId);
     }
 
     @PreAuthorize("hasRole('ADMIN')")

@@ -27,6 +27,11 @@ public class UserController {
         return userService.getUsers();
     }
 
+    @GetMapping("/api/v1/users/{page}")
+    public List<UserDTO> getUsersByTen(@PathVariable int page){
+        return userService.getUsersByTen(page);
+    }
+
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/api/v1/admin/setRole/{userId}")
     public ResponseEntity<?> setRole(@PathVariable @Min(1) Long userId, @RequestBody List<ROLES> roles, @NonNull Principal principal) {

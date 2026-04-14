@@ -10,6 +10,9 @@ import com.sap.documentmgn.repository.DocumentRepository;
 import com.sap.documentmgn.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -34,6 +37,14 @@ public class UserService{
         log.info("Fetching all users from the database");
 
         List<User> users = userRepository.findAll();
+        return users.stream().map(userMapper::toUserDTO).collect(Collectors.toList());
+    }
+
+    public List<UserDTO> getUsersByTen(int offset) {
+        log.info("Fetching 10 users from the database");
+
+        Pageable pageable = PageRequest.of(offset, 10);
+        Page<User> users = userRepository.findAll(pageable);
         return users.stream().map(userMapper::toUserDTO).collect(Collectors.toList());
     }
 

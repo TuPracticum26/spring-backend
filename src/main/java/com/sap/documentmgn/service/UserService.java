@@ -1,4 +1,5 @@
 package com.sap.documentmgn.service;
+
 import com.sap.documentmgn.dto.UserDTO;
 import com.sap.documentmgn.dto.UserRegistrationDTO;
 import com.sap.documentmgn.entity.Document;
@@ -9,13 +10,17 @@ import com.sap.documentmgn.repository.DocumentRepository;
 import com.sap.documentmgn.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -35,7 +40,15 @@ public class UserService{
         return users.stream().map(userMapper::toUserDTO).collect(Collectors.toList());
     }
 
-    public void setRole(Long userId, ROLES role, String adminUsername) {
+    public List<UserDTO> getUsersByTen(int offset) {
+        log.info("Fetching 10 users from the database");
+
+        Pageable pageable = PageRequest.of(offset, 10);
+        Page<User> users = userRepository.findAll(pageable);
+        return users.stream().map(userMapper::toUserDTO).collect(Collectors.toList());
+    }
+
+    public void setRole(Long userId, List<ROLES> roles, String adminUsername) {
         Optional<User> adminOpt = userRepository.findByUsername(adminUsername);
         User admin = adminOpt.orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND, "Admin not found!"));
@@ -51,12 +64,12 @@ public class UserService{
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot change your own role");
         }
 
-        user.addRole(role);
+        user.setRoles(roles);
         userRepository.save(user);
-        log.info("Admin {} set role {} for user {}", adminUsername, role, user.getUsername());
+        log.info("Admin {} set roles {} for user {}", adminUsername, roles, user.getUsername());
     }
 
-    public void deleteUser(Long userId, String adminUsername) {
+    public void deleteUser(Long userId, String initUsername) {
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> {
@@ -64,13 +77,24 @@ public class UserService{
                     return new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
                 });
 
-        if (user.getUsername().equals(adminUsername)) {
-            log.warn("Admin {} attempted to delete their own account", adminUsername);
+        User initUser = userRepository.findByUsername(initUsername)
+                .orElseThrow(() -> {
+                    log.warn("User with id {} not found", initUsername);
+                    return new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
+                });
+
+        if (user.getUsername().equals(initUsername) && user.getRoles().contains(ROLES.ADMIN)) {
+            log.warn("Admin {} attempted to delete their own account", initUsername);
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot delete your admin account");
         }
 
+        if (!user.getUsername().equals((initUsername)) && !initUser.getRoles().contains(ROLES.ADMIN)) {
+            log.warn("{} attempted to delete another account", initUsername);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Only an admin account can delete other accounts");
+        }
+
         userRepository.delete(user);
-        log.info("Admin {} deleted user {}", adminUsername, user.getUsername());
+        log.info("{} deleted user {}", initUsername, user.getUsername());
     }
 
     public void deleteDocument(Long documentId, String username) {
@@ -102,5 +126,11 @@ public class UserService{
         User savedUser = userRepository.save(user);
 
         return userMapper.toUserDTO(savedUser);
+    }
+
+    public UserDTO getUserByUsername(String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+        return userMapper.toUserDTO(user);
     }
 }

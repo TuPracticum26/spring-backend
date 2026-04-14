@@ -139,15 +139,6 @@ public class UserService{
         return userMapper.toUserDTO(user);
     }
 
-    private Long id;
-    private String status;
-
-    private Integer versionNumber;
-    private String content;
-    private String createdByUsername;
-    private LocalDateTime createdAt;
-    private Long documentId;
-    private List<String> comments;
 
     public List<DocumentVersionDTO> getAllUserVersions(Long userId) {
         List<DocumentVersion> userDocVersions = documentVersionRepository.findDocumentVersionsByUser(userId);

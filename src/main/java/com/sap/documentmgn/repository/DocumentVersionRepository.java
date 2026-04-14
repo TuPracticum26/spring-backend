@@ -25,10 +25,6 @@ public interface DocumentVersionRepository extends JpaRepository<DocumentVersion
     Optional<DocumentVersion> findByDocumentIdAndVersionNumber(Long documentId, Long versionNumber);
 
 
-//    @Query("SELECT new com.sap.documentmgn.dto.DocumentVersionDTO(dv.id, dv.status, dv.versionNumber, dv.content, dv.createdByUsername, dv.createdAt, dv.documentId, dv.comments) " +
-//            "FROM DocumentVersion dv WHERE dv.createdBy = :userId")
-//    List<DocumentVersionDTO> findDocumentVersionsByUser(@Param("userId") Long userId);
-
     @Query("SELECT dv FROM DocumentVersion dv " +
             "WHERE dv.createdBy.id = :userId")
     List<DocumentVersion> findDocumentVersionsByUser(@Param("userId") Long userId);

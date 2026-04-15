@@ -59,9 +59,9 @@ public class UserService{
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot change your own role");
         }
 
-        user.setRoles(roles);
+        user.setRoles(role);
         userRepository.save(user);
-        log.info("Admin {} set roles {} for user {}", adminUsername, roles, user.getUsername());
+        log.info("Admin {} set role {} for user {}", adminUsername, role, user.getUsername());
     }
 
     public List<UserDTO> getUsersByTen(int offset) {

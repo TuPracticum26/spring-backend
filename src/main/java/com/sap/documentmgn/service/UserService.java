@@ -139,10 +139,25 @@ public class UserService{
         return userMapper.toUserDTO(user);
     }
 
+    public List<DocumentVersionDTO> getAllUserVersions(Long userId) {
+        List<DocumentVersion> userDocVersions = documentVersionRepository.findDocumentVersionsByUser(userId);
+        return userDocVersions.stream()
+                .map(dv -> new DocumentVersionDTO(
+                        dv.getId(),
+                        dv.getStatus(),
+                        dv.getVersionNumber(),
+                        dv.getContent(),
+                        dv.getCreatedBy().getUsername(),
+                        dv.getCreatedAt(),
+                        dv.getDocument().getId(),
+                        dv.getComments()
+                ))
+                .toList();
+    }
 
-    public List<DocumentVersionDTO> getAllUserVersions(Long userId, int offset) {
+    public List<DocumentVersionDTO> getAllUserVersionsPage(Long userId, int offset) {
         Pageable pageable = PageRequest.of(offset, 10);
-        Page<DocumentVersion> userDocVersions = documentVersionRepository.findDocumentVersionsByUser(userId, pageable);
+        Page<DocumentVersion> userDocVersions = documentVersionRepository.findDocumentVersionsByUserPage(userId, pageable);
         return userDocVersions.stream()
                 .map(dv -> new DocumentVersionDTO(
                         dv.getId(),

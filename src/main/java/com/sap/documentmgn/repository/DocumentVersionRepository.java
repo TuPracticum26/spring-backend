@@ -26,8 +26,11 @@ public interface DocumentVersionRepository extends JpaRepository<DocumentVersion
 
     Optional<DocumentVersion> findByDocumentIdAndVersionNumber(Long documentId, Long versionNumber);
 
+    @Query("SELECT dv FROM DocumentVersion dv " +
+            "WHERE dv.createdBy.id = :userId")
+    List<DocumentVersion> findDocumentVersionsByUser(@Param("userId") Long userId);
 
     @Query("SELECT dv FROM DocumentVersion dv " +
             "WHERE dv.createdBy.id = :userId")
-    Page<DocumentVersion> findDocumentVersionsByUser(@Param("userId") Long userId, Pageable pageable);
+    Page<DocumentVersion> findDocumentVersionsByUserPage(@Param("userId") Long userId, Pageable pageable);
 }

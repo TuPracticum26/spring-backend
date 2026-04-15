@@ -48,15 +48,6 @@ public class UserService{
                     return new ResponseStatusException(HttpStatus.NOT_FOUND, "Admin not found!");
                 });
 
-    public List<UserDTO> getUsersByTen(int offset) {
-        log.info("Fetching 10 users from the database");
-
-        Pageable pageable = PageRequest.of(offset, 10);
-        Page<User> users = userRepository.findAll(pageable);
-        return users.stream().map(userMapper::toUserDTO).collect(Collectors.toList());
-    }
-
-
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> {
                     log.warn("User with id {} not found", userId);
@@ -71,6 +62,14 @@ public class UserService{
         user.setRoles(roles);
         userRepository.save(user);
         log.info("Admin {} set roles {} for user {}", adminUsername, roles, user.getUsername());
+    }
+
+    public List<UserDTO> getUsersByTen(int offset) {
+        log.info("Fetching 10 users from the database");
+
+        Pageable pageable = PageRequest.of(offset, 10);
+        Page<User> users = userRepository.findAll(pageable);
+        return users.stream().map(userMapper::toUserDTO).collect(Collectors.toList());
     }
 
     public void deleteUser(Long userId, String initUsername) {

@@ -2,6 +2,8 @@ package com.sap.documentmgn.repository;
 
 import com.sap.documentmgn.dto.DocumentVersionDTO;
 import com.sap.documentmgn.entity.DocumentVersion;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -27,5 +29,5 @@ public interface DocumentVersionRepository extends JpaRepository<DocumentVersion
 
     @Query("SELECT dv FROM DocumentVersion dv " +
             "WHERE dv.createdBy.id = :userId")
-    List<DocumentVersion> findDocumentVersionsByUser(@Param("userId") Long userId);
+    Page<DocumentVersion> findDocumentVersionsByUser(@Param("userId") Long userId, Pageable pageable);
 }

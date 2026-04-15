@@ -33,9 +33,9 @@ public class UserController {
         return userService.getUsersByTen(page);
     }
 
-    @GetMapping("/api/v1/users/{userId}/versions")
-    public List<DocumentVersionDTO> getAllUserVersions(@PathVariable Long userId) {
-        return userService.getAllUserVersions(userId);
+    @GetMapping("/api/v1/users/{userId}/versions/{page}")
+    public List<DocumentVersionDTO> getAllUserVersions(@PathVariable Long userId, @PathVariable int page) {
+        return userService.getAllUserVersions(userId, page);
     }
 
     @PreAuthorize("hasRole('ADMIN')")

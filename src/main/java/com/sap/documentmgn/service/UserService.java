@@ -140,8 +140,9 @@ public class UserService{
     }
 
 
-    public List<DocumentVersionDTO> getAllUserVersions(Long userId) {
-        List<DocumentVersion> userDocVersions = documentVersionRepository.findDocumentVersionsByUser(userId);
+    public List<DocumentVersionDTO> getAllUserVersions(Long userId, int offset) {
+        Pageable pageable = PageRequest.of(offset, 10);
+        Page<DocumentVersion> userDocVersions = documentVersionRepository.findDocumentVersionsByUser(userId, pageable);
         return userDocVersions.stream()
                 .map(dv -> new DocumentVersionDTO(
                         dv.getId(),

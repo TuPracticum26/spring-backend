@@ -17,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
@@ -40,18 +41,12 @@ public class UserService{
         return users.stream().map(userMapper::toUserDTO).collect(Collectors.toList());
     }
 
-    public List<UserDTO> getUsersByTen(int offset) {
-        log.info("Fetching 10 users from the database");
-
-        Pageable pageable = PageRequest.of(offset, 10);
-        Page<User> users = userRepository.findAll(pageable);
-        return users.stream().map(userMapper::toUserDTO).collect(Collectors.toList());
-    }
-
     public void setRole(Long userId, List<ROLES> roles, String adminUsername) {
-        Optional<User> adminOpt = userRepository.findByUsername(adminUsername);
-        User admin = adminOpt.orElseThrow(() ->
-                new ResponseStatusException(HttpStatus.NOT_FOUND, "Admin not found!"));
+        User admin = userRepository.findByUsername(adminUsername)
+                .orElseThrow(() -> {
+                    log.warn("Admin with username {} not found", adminUsername);
+                    return new ResponseStatusException(HttpStatus.NOT_FOUND, "Admin not found!");
+                });
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> {
@@ -66,7 +61,15 @@ public class UserService{
 
         user.setRoles(roles);
         userRepository.save(user);
-        log.info("Admin {} set roles {} for user {}", adminUsername, roles, user.getUsername());
+        log.info("Admin {} set role {} for user {}", adminUsername, roles, user.getUsername());
+    }
+
+    public List<UserDTO> getUsersByTen(int offset) {
+        log.info("Fetching 10 users from the database");
+
+        Pageable pageable = PageRequest.of(offset, 10);
+        Page<User> users = userRepository.findAll(pageable);
+        return users.stream().map(userMapper::toUserDTO).collect(Collectors.toList());
     }
 
     public void deleteUser(Long userId, String initUsername) {
@@ -97,26 +100,7 @@ public class UserService{
         log.info("{} deleted user {}", initUsername, user.getUsername());
     }
 
-    public void deleteDocument(Long documentId, String username) {
-        Document document = documentRepository.findById(documentId)
-                .orElseThrow(() -> {
-                    log.warn("Document with id {} not found", documentId);
-                    return new ResponseStatusException(HttpStatus.NOT_FOUND, "Document not found");
-                });
-
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> {
-                    return new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
-                });
-        if (!document.getAuthor().getUsername().equals(username) && !user.getRoles().contains(ROLES.ADMIN)) {
-            log.warn("User with username {} attempted to delete document with id {} created by {}", username, documentId, document.getAuthor().getUsername());
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You can only delete documents you created");
-        }
-
-        documentRepository.delete(document);
-        log.info("Document with id {} deleted", documentId);
-    }
-
+    @Transactional
     public UserDTO registerUser(UserRegistrationDTO registrationDTO) {
         User user = new User();
         user.setUsername(registrationDTO.getUsername());

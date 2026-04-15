@@ -59,7 +59,7 @@ public class UserService{
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot change your own role");
         }
 
-        user.setRoles(role);
+        user.addRole(role);
         userRepository.save(user);
         log.info("Admin {} set role {} for user {}", adminUsername, role, user.getUsername());
     }

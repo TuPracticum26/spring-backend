@@ -10,7 +10,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.web.server.ResponseStatusException;
+import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
@@ -18,11 +18,10 @@ public class CustomUserDetailService implements UserDetailsService {
     private final UserRepository userRepository;
 
     @Override
-    @Transactional(readOnly = true) //<-- Оправи автентикацията
+    @Transactional(readOnly = true)
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        // findByUsername вече връща Optional<User>
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not found"));
+        Optional<User> userOpt = userRepository.findByUsername(username);
+        User user = userOpt.orElseThrow(() -> new UsernameNotFoundException("User not found" + username));
 
         String[] rolesArray = user.getRoles()
                 .stream()

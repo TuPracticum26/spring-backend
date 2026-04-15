@@ -36,15 +36,15 @@ public class DocumentVersionService {
                     return new ResponseStatusException(HttpStatus.NOT_FOUND, "Version not found");
                 });
 
-//        Optional<User> userOpt = userRepository.findByUsername(username);
-        User user = userRepository.findByUsername(username).orElseThrow(() -> {
+        Optional<User> userOpt = userRepository.findByUsername(username);
+        User user = userOpt.orElseThrow(() -> {
             log.warn("Username {} not found", username);
             return new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
         });
 
         log.debug("User {} has roles {}", username, user.getRoles());
 
-        if (version.getStatus() != VersionStatus.DRAFT) {
+        if (version.getStatus() != VersionStatus.PENDING) {
             log.warn("Version number {} for document with id {} has status {} and cannot be approved", versionNumber, docId, version.getStatus());
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Only DRAFT versions can be approved");
         }
@@ -63,7 +63,7 @@ public class DocumentVersionService {
                     return new ResponseStatusException(HttpStatus.NOT_FOUND, "Version not found");
                 });
 
-        if (version.getStatus() != VersionStatus.DRAFT) {
+        if (version.getStatus() != VersionStatus.PENDING) {
             log.warn("Version number {} has status {} and cannot be rejected", versionNumber, version.getStatus());
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Only DRAFT versions can be rejected");
         }

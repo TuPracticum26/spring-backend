@@ -1,4 +1,4 @@
-package com.sap.documentmgn.service;
+package com.sap.documentmgn.controller;
 
 import com.sap.documentmgn.entity.User;
 import com.sap.documentmgn.repository.UserRepository;
@@ -20,7 +20,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 @SpringBootTest
 @AutoConfigureMockMvc
 @AllArgsConstructor
-public class UserServiceIntegrationTest {
+public class UserServiceIntegrationTests {
     @Autowired
     private MockMvc mockMvc;
 

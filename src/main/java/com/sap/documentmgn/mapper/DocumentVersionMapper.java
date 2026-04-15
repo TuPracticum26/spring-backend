@@ -23,6 +23,6 @@ public interface DocumentVersionMapper {
     @Mapping(source = "document.id", target = "documentId")
     @Mapping(target = "content", ignore = true)
     @Mapping(source = "status", target = "status")
-    DocumentVersionDTO toDocumentVersionSummaryDTO(DocumentVersion documentVersion);
+    DocumentVersionDTO toSummaryDTO(DocumentVersion documentVersion);
 
 }

@@ -1,6 +1,7 @@
 package com.sap.documentmgn.mapper;
 
 import com.sap.documentmgn.dto.DocumentVersionDTO;
+import com.sap.documentmgn.dto.DocumentVersionSummaryDTO;
 import com.sap.documentmgn.entity.DocumentVersion;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -23,4 +24,5 @@ public interface DocumentVersionMapper {
     @Mapping(target = "content", ignore = true)
     @Mapping(source = "status", target = "status")
     DocumentVersionDTO toDocumentVersionSummaryDTO(DocumentVersion documentVersion);
+
 }

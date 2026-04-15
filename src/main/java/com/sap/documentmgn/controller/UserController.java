@@ -30,27 +30,33 @@ public class UserController {
         return userService.getUsers();
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping("/api/v1/admin/setRole/{userId}/{role}")
-    public ResponseEntity<?> setRole(@PathVariable @Min(1) Long userId, @PathVariable ROLES role, @NonNull Principal principal) {
-        String adminUsername = principal.getName();
-        userService.setRole(userId, role, adminUsername);
-        return ResponseEntity.ok().build();
+    @GetMapping("/api/v1/users/{page}")
+    public List<UserDTO> getUsersByTen(@PathVariable int page){
+        return userService.getUsersByTen(page);
     }
 
     @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping("/api/v1/admin/setRole/{userId}")
+    public ResponseEntity<?> setRole(@PathVariable @Min(1) Long userId, @RequestBody List<ROLES> roles, @NonNull Principal principal) {
+        String adminUsername = principal.getName();
+        userService.setRole(userId, roles, adminUsername);
+        return ResponseEntity.ok().build();
+    }
+
     @DeleteMapping("/api/v1/admin/deleteUser/{userId}")
     public ResponseEntity<?> deleteUser(@PathVariable @Min(1) Long userId, @NonNull Principal principal) {
-        String adminUsername = principal.getName();
-        userService.deleteUser(userId, adminUsername);
+        String initUsername = principal.getName();
+        userService.deleteUser(userId, initUsername);
         return ResponseEntity.ok().build();
     }
 
     @PreAuthorize("hasRole('ADMIN') || hasRole('AUTHOR')")
     @DeleteMapping("/api/v1/deleteDocument/{documentId}")
     public ResponseEntity<?> deleteDocument(@PathVariable @Min(1) Long documentId, @NonNull Principal principal) {
+
         String username = principal.getName();
         documentService.deleteDocument(documentId, username);
+
         return ResponseEntity.ok().build();
     }
 }

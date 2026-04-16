@@ -2,6 +2,7 @@ package com.sap.documentmgn.service;
 
 import com.sap.documentmgn.dto.UserDTO;
 import com.sap.documentmgn.dto.UserRegistrationDTO;
+import com.sap.documentmgn.entity.ROLES;
 import com.sap.documentmgn.entity.User;
 import com.sap.documentmgn.mapper.UserMapper;
 import com.sap.documentmgn.repository.UserRepository;
@@ -68,7 +69,7 @@ public class UserServiceUnitTests {
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
         when(userRepository.findByUsername("testAdmin")).thenReturn(Optional.of(admin));
 
-        userService.setRole(1L, READER, "testAdmin");
+        userService.setRole(1L, List.of(READER), "testAdmin");
         assertTrue(user.getRoles().contains(READER));
 
         verify(userRepository).findById(1L);
@@ -82,7 +83,7 @@ public class UserServiceUnitTests {
                 .thenReturn(Optional.empty());
 
         ResponseStatusException ex = assertThrows(ResponseStatusException.class,
-                () -> userService.setRole(1L, ADMIN, "testAdmin"));
+                () -> userService.setRole(1L, List.of(ADMIN), "testAdmin"));
 
         assertEquals(HttpStatus.NOT_FOUND, ex.getStatusCode());
     }
@@ -93,7 +94,7 @@ public class UserServiceUnitTests {
         when(userRepository.findById(1L)).thenReturn(Optional.empty());
 
         ResponseStatusException ex = assertThrows(ResponseStatusException.class,
-                () -> userService.setRole(1L, READER, "testAdmin"));
+                () -> userService.setRole(1L, List.of(READER), "testAdmin"));
 
         assertEquals(HttpStatus.NOT_FOUND, ex.getStatusCode());
     }
@@ -111,7 +112,7 @@ public class UserServiceUnitTests {
                 .thenReturn(Optional.of(admin));
 
         ResponseStatusException ex = assertThrows(ResponseStatusException.class,
-                () -> userService.setRole(1L, READER, "testAdmin"));
+                () -> userService.setRole(1L, List.of(READER), "testAdmin"));
 
         assertEquals(HttpStatus.BAD_REQUEST, ex.getStatusCode());
     }
@@ -126,11 +127,14 @@ public class UserServiceUnitTests {
         User admin = new User();
         admin.setId(2L);
         admin.setUsername("testAdmin");
+        admin.setRoles(List.of(ROLES.ADMIN));
 
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(userRepository.findByUsername("testAdmin")).thenReturn(Optional.of(admin));
         userService.deleteUser(1L, "testAdmin");
 
         verify(userRepository).findById(1L);
+        verify(userRepository).findByUsername("testAdmin");
         verify(userRepository).delete(user);
     }
 
@@ -147,9 +151,10 @@ public class UserServiceUnitTests {
         User admin = new User();
         admin.setId(1L);
         admin.setUsername("testAdmin");
+        admin.setRoles(List.of(ROLES.ADMIN));
 
-        when(userRepository.findById(1L))
-                .thenReturn(Optional.of(admin));
+        when(userRepository.findById(1L)).thenReturn(Optional.of(admin));
+        when(userRepository.findByUsername("testAdmin")).thenReturn(Optional.of(admin));
 
         ResponseStatusException ex = assertThrows(ResponseStatusException.class,
                 () -> userService.deleteUser(1L, "testAdmin"));

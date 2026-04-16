@@ -87,7 +87,7 @@ public class UserService{
 
         User initUser = userRepository.findByUsername(initUsername)
                 .orElseThrow(() -> {
-                    log.warn("User with id {} not found", initUsername);
+                    log.warn("User with username {} not found", initUsername);
                     return new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
                 });
 

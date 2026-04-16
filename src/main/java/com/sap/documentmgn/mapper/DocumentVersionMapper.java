@@ -19,6 +19,9 @@ public interface DocumentVersionMapper {
     @Mapping(target = "status", source = "status")
     DocumentVersion toEntity(DocumentVersionDTO documentVersionDTO);
 
-    @Mapping(target = "createdByUsername", source = "createdBy.username")
+    @Mapping(source = "createdBy.username", target = "createdByUsername")
+    @Mapping(source = "document.id", target = "id")
+    @Mapping(source = "status", target = "status")
     DocumentVersionSummaryDTO toSummaryDTO(DocumentVersion documentVersion);
+
 }

@@ -1,5 +1,6 @@
 package com.sap.documentmgn.dto;
 
+import com.sap.documentmgn.entity.VersionStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -10,7 +11,7 @@ import java.util.List;
 @AllArgsConstructor
 public class DocumentVersionDTO {
     private Long id;
-    private String status;
+    private VersionStatus status;
 
     private Integer versionNumber;
     private String content;
@@ -19,7 +20,7 @@ public class DocumentVersionDTO {
     private Long documentId;
     private List<String> comments;
 
-    public DocumentVersionDTO(Long id, String status) {
+    public DocumentVersionDTO(Long id, VersionStatus status) {
         this.id = id;
         this.status = status;
     }

@@ -1,5 +1,6 @@
 package com.sap.documentmgn.controller;
 
+import com.sap.documentmgn.dto.DocumentVersionDTO;
 import com.sap.documentmgn.dto.UserDTO;
 import com.sap.documentmgn.entity.ROLES;
 import com.sap.documentmgn.service.DocumentService;
@@ -30,27 +31,49 @@ public class UserController {
         return userService.getUsers();
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping("/api/v1/admin/setRole/{userId}/{role}")
-    public ResponseEntity<?> setRole(@PathVariable @Min(1) Long userId, @PathVariable ROLES role, @NonNull Principal principal) {
-        String adminUsername = principal.getName();
-        userService.setRole(userId, role, adminUsername);
-        return ResponseEntity.ok().build();
+    @GetMapping("/api/v1/users/{page}")
+    public List<UserDTO> getUsersByTen(@PathVariable int page){
+        return userService.getUsersByTen(page);
+    }
+
+
+    @GetMapping("/api/v1/users/versions/{page}")
+    public List<DocumentVersionDTO> getAllTeamVersionsPage(@PathVariable int page) {
+        return userService.getAllTeamVersionsPage(page);
+    }
+
+    @GetMapping("/api/v1/users/{userId}/versions")
+    public List<DocumentVersionDTO> getAllUserVersions(@PathVariable Long userId) {
+        return userService.getAllUserVersions(userId);
+    }
+
+    @GetMapping("users/{userId}/versions/{page}")
+    public List<DocumentVersionDTO> getAllUserVersionsPage(@PathVariable Long userId, @PathVariable int page) {
+        return userService.getAllUserVersionsPage(userId, page);
     }
 
     @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping("/api/v1/admin/setRole/{userId}")
+    public ResponseEntity<?> setRole(@PathVariable @Min(1) Long userId, @RequestBody List<ROLES> roles, @NonNull Principal principal) {
+        String adminUsername = principal.getName();
+        userService.setRole(userId, roles, adminUsername);
+        return ResponseEntity.ok().build();
+    }
+
     @DeleteMapping("/api/v1/admin/deleteUser/{userId}")
     public ResponseEntity<?> deleteUser(@PathVariable @Min(1) Long userId, @NonNull Principal principal) {
-        String adminUsername = principal.getName();
-        userService.deleteUser(userId, adminUsername);
+        String initUsername = principal.getName();
+        userService.deleteUser(userId, initUsername);
         return ResponseEntity.ok().build();
     }
 
     @PreAuthorize("hasRole('ADMIN') || hasRole('AUTHOR')")
     @DeleteMapping("/api/v1/deleteDocument/{documentId}")
     public ResponseEntity<?> deleteDocument(@PathVariable @Min(1) Long documentId, @NonNull Principal principal) {
+
         String username = principal.getName();
         documentService.deleteDocument(documentId, username);
+
         return ResponseEntity.ok().build();
     }
 }

@@ -1,12 +1,15 @@
 package com.sap.documentmgn.service;
 
+import com.sap.documentmgn.dto.DocumentVersionDTO;
 import com.sap.documentmgn.dto.UserDTO;
 import com.sap.documentmgn.dto.UserRegistrationDTO;
 import com.sap.documentmgn.entity.Document;
+import com.sap.documentmgn.entity.DocumentVersion;
 import com.sap.documentmgn.entity.ROLES;
 import com.sap.documentmgn.entity.User;
 import com.sap.documentmgn.mapper.UserMapper;
 import com.sap.documentmgn.repository.DocumentRepository;
+import com.sap.documentmgn.repository.DocumentVersionRepository;
 import com.sap.documentmgn.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -30,6 +34,7 @@ import java.util.stream.Collectors;
 public class UserService{
     private final UserRepository userRepository;
     private final DocumentRepository documentRepository;
+    private final DocumentVersionRepository documentVersionRepository;
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
 
@@ -116,5 +121,38 @@ public class UserService{
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
         return userMapper.toUserDTO(user);
+    }
+
+    public List<DocumentVersionDTO> getAllUserVersions(Long userId) {
+        List<DocumentVersion> userDocVersions = documentVersionRepository.findDocumentVersionsByUser(userId);
+        return userDocVersions.stream()
+                .map(dv -> new DocumentVersionDTO(
+                        dv.getId(),
+                        dv.getStatus(),
+                        dv.getVersionNumber(),
+                        dv.getContent(),
+                        dv.getCreatedBy().getUsername(),
+                        dv.getCreatedAt(),
+                        dv.getDocument().getId(),
+                        dv.getComments()
+                ))
+                .toList();
+    }
+
+    public List<DocumentVersionDTO> getAllUserVersionsPage(Long userId, int offset) {
+        Pageable pageable = PageRequest.of(offset, 10);
+        Page<DocumentVersion> userDocVersions = documentVersionRepository.findDocumentVersionsByUserPage(userId, pageable);
+        return userDocVersions.stream()
+                .map(dv -> new DocumentVersionDTO(
+                        dv.getId(),
+                        dv.getStatus(),
+                        dv.getVersionNumber(),
+                        dv.getContent(),
+                        dv.getCreatedBy().getUsername(),
+                        dv.getCreatedAt(),
+                        dv.getDocument().getId(),
+                        dv.getComments()
+                ))
+                .toList();
     }
 }

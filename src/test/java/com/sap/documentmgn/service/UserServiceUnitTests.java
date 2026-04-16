@@ -159,7 +159,7 @@ public class UserServiceUnitTests {
 
 
     @Test
-    void testRegisterUser_success() {
+    public void testRegisterUser_success() {
         UserRegistrationDTO dto = new UserRegistrationDTO();
         dto.setUsername("testUser");
         dto.setPassword("testUser123!");
@@ -182,5 +182,19 @@ public class UserServiceUnitTests {
         verify(userMapper).toUserDTO(savedUser);
     }
 
-    // не знам как да проверя повече UserRegistration
+    @Test
+    public void testRegistrationUser_usernameTaken(){
+        UserRegistrationDTO dto = new UserRegistrationDTO();
+        dto.setUsername("testUser");
+
+        UserRegistrationDTO dto2 = new UserRegistrationDTO();
+        dto2.setUsername("testUser");
+
+        when(userRepository.findByUsername("testUser")).thenReturn(Optional.of(new User()));
+
+        ResponseStatusException ex = assertThrows(ResponseStatusException.class,
+                () -> userService.registerUser(dto));
+
+        assertEquals(HttpStatus.CONFLICT, ex.getStatusCode());
+    }
 }

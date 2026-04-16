@@ -78,13 +78,19 @@ public class UserService{
 
     @Transactional
     public UserDTO registerUser(UserRegistrationDTO registrationDTO) {
+        Optional<User> optUser = userRepository.findByUsername(registrationDTO.getUsername());
+        optUser.ifPresent(u-> {
+                    log.warn("User with username {} already exists", registrationDTO.getUsername());
+                    throw new ResponseStatusException(HttpStatus.CONFLICT, "Username already exists");
+                });
+
         User user = new User();
         user.setUsername(registrationDTO.getUsername());
         user.setPassword(passwordEncoder.encode(registrationDTO.getPassword()));
         user.addRole(ROLES.READER);
-
         User savedUser = userRepository.save(user);
 
+        log.info("Registered new user with username {}", registrationDTO.getUsername());
         return userMapper.toUserDTO(savedUser);
     }
 }

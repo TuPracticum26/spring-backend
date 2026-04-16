@@ -1,12 +1,15 @@
 package com.sap.documentmgn.service;
 
+import com.sap.documentmgn.dto.DocumentVersionDTO;
 import com.sap.documentmgn.dto.UserDTO;
 import com.sap.documentmgn.dto.UserRegistrationDTO;
 import com.sap.documentmgn.entity.Document;
+import com.sap.documentmgn.entity.DocumentVersion;
 import com.sap.documentmgn.entity.ROLES;
 import com.sap.documentmgn.entity.User;
 import com.sap.documentmgn.mapper.UserMapper;
 import com.sap.documentmgn.repository.DocumentRepository;
+import com.sap.documentmgn.repository.DocumentVersionRepository;
 import com.sap.documentmgn.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,8 +20,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -29,6 +34,7 @@ import java.util.stream.Collectors;
 public class UserService{
     private final UserRepository userRepository;
     private final DocumentRepository documentRepository;
+    private final DocumentVersionRepository documentVersionRepository;
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
 
@@ -40,18 +46,12 @@ public class UserService{
         return users.stream().map(userMapper::toUserDTO).collect(Collectors.toList());
     }
 
-    public List<UserDTO> getUsersByTen(int offset) {
-        log.info("Fetching 10 users from the database");
-
-        Pageable pageable = PageRequest.of(offset, 10);
-        Page<User> users = userRepository.findAll(pageable);
-        return users.stream().map(userMapper::toUserDTO).collect(Collectors.toList());
-    }
-
     public void setRole(Long userId, List<ROLES> roles, String adminUsername) {
-        Optional<User> adminOpt = userRepository.findByUsername(adminUsername);
-        User admin = adminOpt.orElseThrow(() ->
-                new ResponseStatusException(HttpStatus.NOT_FOUND, "Admin not found!"));
+        User admin = userRepository.findByUsername(adminUsername)
+                .orElseThrow(() -> {
+                    log.warn("Admin with username {} not found", adminUsername);
+                    return new ResponseStatusException(HttpStatus.NOT_FOUND, "Admin not found!");
+                });
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> {
@@ -66,7 +66,15 @@ public class UserService{
 
         user.setRoles(roles);
         userRepository.save(user);
-        log.info("Admin {} set roles {} for user {}", adminUsername, roles, user.getUsername());
+        log.info("Admin {} set role {} for user {}", adminUsername, roles, user.getUsername());
+    }
+
+    public List<UserDTO> getUsersByTen(int offset) {
+        log.info("Fetching 10 users from the database");
+
+        Pageable pageable = PageRequest.of(offset, 10);
+        Page<User> users = userRepository.findAll(pageable);
+        return users.stream().map(userMapper::toUserDTO).collect(Collectors.toList());
     }
 
     public void deleteUser(Long userId, String initUsername) {
@@ -97,26 +105,7 @@ public class UserService{
         log.info("{} deleted user {}", initUsername, user.getUsername());
     }
 
-    public void deleteDocument(Long documentId, String username) {
-        Document document = documentRepository.findById(documentId)
-                .orElseThrow(() -> {
-                    log.warn("Document with id {} not found", documentId);
-                    return new ResponseStatusException(HttpStatus.NOT_FOUND, "Document not found");
-                });
-
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> {
-                    return new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
-                });
-        if (!document.getAuthor().getUsername().equals(username) && !user.getRoles().contains(ROLES.ADMIN)) {
-            log.warn("User with username {} attempted to delete document with id {} created by {}", username, documentId, document.getAuthor().getUsername());
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You can only delete documents you created");
-        }
-
-        documentRepository.delete(document);
-        log.info("Document with id {} deleted", documentId);
-    }
-
+    @Transactional
     public UserDTO registerUser(UserRegistrationDTO registrationDTO) {
         User user = new User();
         user.setUsername(registrationDTO.getUsername());
@@ -132,5 +121,55 @@ public class UserService{
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
         return userMapper.toUserDTO(user);
+    }
+
+    public List<DocumentVersionDTO> getAllUserVersions(Long userId) {
+        List<DocumentVersion> userDocVersions = documentVersionRepository.findDocumentVersionsByUser(userId);
+        return userDocVersions.stream()
+                .map(dv -> new DocumentVersionDTO(
+                        dv.getId(),
+                        dv.getStatus(),
+                        dv.getVersionNumber(),
+                        dv.getContent(),
+                        dv.getCreatedBy().getUsername(),
+                        dv.getCreatedAt(),
+                        dv.getDocument().getId(),
+                        dv.getComments()
+                ))
+                .toList();
+    }
+
+    public List<DocumentVersionDTO> getAllUserVersionsPage(Long userId, int offset) {
+        Pageable pageable = PageRequest.of(offset, 10);
+        Page<DocumentVersion> userDocVersions = documentVersionRepository.findDocumentVersionsByUserPage(userId, pageable);
+        return userDocVersions.stream()
+                .map(dv -> new DocumentVersionDTO(
+                        dv.getId(),
+                        dv.getStatus(),
+                        dv.getVersionNumber(),
+                        dv.getContent(),
+                        dv.getCreatedBy().getUsername(),
+                        dv.getCreatedAt(),
+                        dv.getDocument().getId(),
+                        dv.getComments()
+                ))
+                .toList();
+    }
+
+    public List<DocumentVersionDTO> getAllTeamVersionsPage(int offset) {
+        Pageable pageable = PageRequest.of(offset, 10);
+        Page<DocumentVersion> userDocVersions = documentVersionRepository.findAll(pageable);
+        return userDocVersions.stream()
+                .map(dv -> new DocumentVersionDTO(
+                        dv.getId(),
+                        dv.getStatus(),
+                        dv.getVersionNumber(),
+                        dv.getContent(),
+                        dv.getCreatedBy().getUsername(),
+                        dv.getCreatedAt(),
+                        dv.getDocument().getId(),
+                        dv.getComments()
+                ))
+                .toList();
     }
 }

@@ -47,7 +47,7 @@ public class UserController {
         return userService.getAllUserVersions(userId);
     }
 
-    @GetMapping("users/{userId}/versions/{page}")
+    @GetMapping("/api/v1/users/{userId}/versions/{page}")
     public List<DocumentVersionDTO> getAllUserVersionsPage(@PathVariable Long userId, @PathVariable int page) {
         return userService.getAllUserVersionsPage(userId, page);
     }

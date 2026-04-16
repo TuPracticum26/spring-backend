@@ -3,6 +3,7 @@ package com.sap.documentmgn.controller;
 import com.sap.documentmgn.dto.DocumentVersionDTO;
 import com.sap.documentmgn.dto.UserDTO;
 import com.sap.documentmgn.entity.ROLES;
+import com.sap.documentmgn.service.DocumentService;
 import com.sap.documentmgn.service.UserService;
 import jakarta.validation.constraints.Min;
 import org.jspecify.annotations.NonNull;
@@ -18,9 +19,11 @@ import java.util.List;
 @Validated
 public class UserController {
     private final UserService userService;
+    private final DocumentService documentService;
 
-    public UserController(UserService userService){
+    public UserController(UserService userService, DocumentService documentService) {
         this.userService = userService;
+        this.documentService = documentService;
     }
 
     @GetMapping("/api/v1/users")
@@ -67,8 +70,10 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN') || hasRole('AUTHOR')")
     @DeleteMapping("/api/v1/deleteDocument/{documentId}")
     public ResponseEntity<?> deleteDocument(@PathVariable @Min(1) Long documentId, @NonNull Principal principal) {
-        String initUsername = principal.getName();
-        userService.deleteDocument(documentId, initUsername);
+
+        String username = principal.getName();
+        documentService.deleteDocument(documentId, username);
+
         return ResponseEntity.ok().build();
     }
 }

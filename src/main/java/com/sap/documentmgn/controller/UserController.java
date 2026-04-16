@@ -36,12 +36,18 @@ public class UserController {
         return userService.getUsersByTen(page);
     }
 
+
+    @GetMapping("/api/v1/users/versions/{page}")
+    public List<DocumentVersionDTO> getAllTeamVersionsPage(@PathVariable int page) {
+        return userService.getAllTeamVersionsPage(page);
+    }
+
     @GetMapping("/api/v1/users/{userId}/versions")
     public List<DocumentVersionDTO> getAllUserVersions(@PathVariable Long userId) {
         return userService.getAllUserVersions(userId);
     }
 
-    @GetMapping("/api/v1/users/{userId}/versions/{page}")
+    @GetMapping("users/{userId}/versions/{page}")
     public List<DocumentVersionDTO> getAllUserVersionsPage(@PathVariable Long userId, @PathVariable int page) {
         return userService.getAllUserVersionsPage(userId, page);
     }

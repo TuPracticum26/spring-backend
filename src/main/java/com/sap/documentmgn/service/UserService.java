@@ -155,4 +155,21 @@ public class UserService{
                 ))
                 .toList();
     }
+
+    public List<DocumentVersionDTO> getAllTeamVersionsPage(int offset) {
+        Pageable pageable = PageRequest.of(offset, 10);
+        Page<DocumentVersion> userDocVersions = documentVersionRepository.findAll(pageable);
+        return userDocVersions.stream()
+                .map(dv -> new DocumentVersionDTO(
+                        dv.getId(),
+                        dv.getStatus(),
+                        dv.getVersionNumber(),
+                        dv.getContent(),
+                        dv.getCreatedBy().getUsername(),
+                        dv.getCreatedAt(),
+                        dv.getDocument().getId(),
+                        dv.getComments()
+                ))
+                .toList();
+    }
 }

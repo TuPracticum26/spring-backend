@@ -28,7 +28,7 @@ public class User {
     private String password;
 
     @NotEmpty(message="User must have at least one role.")
-    @ElementCollection(targetClass = ROLES.class)
+    @ElementCollection(targetClass = ROLES.class, fetch = FetchType.EAGER)
     @Enumerated(EnumType.STRING)
     @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
     @Column(name = "role")

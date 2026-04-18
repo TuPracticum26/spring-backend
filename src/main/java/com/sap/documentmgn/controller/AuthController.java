@@ -1,8 +1,10 @@
 package com.sap.documentmgn.controller;
 
+import com.sap.documentmgn.dto.AuthResponse;
 import com.sap.documentmgn.dto.LoginRequestDTO;
 import com.sap.documentmgn.dto.UserDTO;
 import com.sap.documentmgn.dto.UserRegistrationDTO;
+import com.sap.documentmgn.service.JwtService;
 import com.sap.documentmgn.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +18,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Map;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/auth")
@@ -23,6 +27,7 @@ public class AuthController {
 
     private final UserService userService;
     private final AuthenticationManager authenticationManager;
+    private final JwtService jwtService;
 
     @PostMapping("/register")
     public ResponseEntity<UserDTO> register(@Valid @RequestBody UserRegistrationDTO registrationDTO){
@@ -31,13 +36,17 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<UserDTO> login(@Valid @RequestBody LoginRequestDTO loginRequestDTO){
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginRequestDTO.getUsername(), loginRequestDTO.getPassword())
+    public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequestDTO loginRequestDTO){
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        loginRequestDTO.getUsername(),
+                        loginRequestDTO.getPassword()
+                )
         );
 
-        UserDTO userDTO = userService.getUserByUsername(loginRequestDTO.getUsername());
-        return ResponseEntity.ok(userDTO);
+        String token = jwtService.generateToken(loginRequestDTO.getUsername());
+        UserDTO user = userService.getUserByUsername(loginRequestDTO.getUsername());
+        return ResponseEntity.ok(new AuthResponse(token, user));
     }
 
 }

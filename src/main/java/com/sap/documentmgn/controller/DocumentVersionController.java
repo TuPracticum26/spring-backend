@@ -22,6 +22,16 @@ public class DocumentVersionController {
         this.documentVersionService = documentVersionService;
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN','AUTHOR','REVIEWER')")
+    @PostMapping("/{docId}/versions/{verId}")
+    public ResponseEntity<DocumentVersionDTO> getDocumentVersionDetails(
+        @PathVariable Long docId,
+        @PathVariable Long verId){
+        DocumentVersionDTO versionDetails = documentVersionService.getVersionDetails(docId,verId);
+        return ResponseEntity.ok(versionDetails);
+    }
+
+
     @PreAuthorize("hasRole('ADMIN') || hasRole('REVIEWER')")
     @PostMapping("{docId}/versions/{versionNumber}/approve")
 

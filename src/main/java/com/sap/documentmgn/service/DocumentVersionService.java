@@ -163,6 +163,18 @@ public class DocumentVersionService {
             documentVersion.getComments().add(comment);
             documentVersionRepository.save(documentVersion);
         }
+    }
+    public DocumentVersionDTO getVersionDetails(Long docId, Long verId) {
+        log.info("Fetching version details for document {} and version {}", docId, verId);
 
+        DocumentVersion version = documentVersionRepository
+                .findByDocumentIdAndVersionNumber(docId, verId)
+                .orElseThrow(() -> {
+                    log.warn("Version {} not found for document {}", verId, docId);
+                    return new ResponseStatusException(HttpStatus.NOT_FOUND,
+                            "Version not found for document " + docId);
+                });
+
+        return documentVersionMapper.toDocumentVersionDTO(version);
     }
 }

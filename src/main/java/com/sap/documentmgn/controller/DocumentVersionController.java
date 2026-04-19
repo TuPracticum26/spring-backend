@@ -1,11 +1,8 @@
 package com.sap.documentmgn.controller;
 
-import com.sap.documentmgn.dto.DocumentHistoryDTO;
-import com.sap.documentmgn.dto.DocumentHistorySummaryDTO;
 import com.sap.documentmgn.dto.DocumentVersionDTO;
 import com.sap.documentmgn.service.DocumentVersionService;
 import jakarta.validation.constraints.Min;
-import jakarta.websocket.server.PathParam;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;

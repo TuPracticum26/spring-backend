@@ -1,9 +1,6 @@
 package com.sap.documentmgn.service;
 
-import com.sap.documentmgn.dto.DocumentHistoryDTO;
-import com.sap.documentmgn.dto.DocumentHistorySummaryDTO;
-import com.sap.documentmgn.dto.DocumentVersionDTO;
-import com.sap.documentmgn.dto.DocumentVersionSummaryDTO;
+import com.sap.documentmgn.dto.*;
 import com.sap.documentmgn.entity.*;
 import com.sap.documentmgn.mapper.DocumentVersionMapper;
 import com.sap.documentmgn.repository.DocumentRepository;
@@ -155,12 +152,9 @@ public class DocumentVersionService {
                    .orElseThrow(() -> {
                        return new ResponseStatusException(HttpStatus.NOT_FOUND, "Document version not found with id: " + verId);
                    });
-
-        comment = comment.trim();
-        if (!comment.isEmpty()) {
             documentVersion.getComments().add(comment);
             documentVersionRepository.save(documentVersion);
-        }
+
     }
     public DocumentVersionDTO getVersionDetails(Long docId, Long verId) {
         log.info("Fetching version details for document {} and version {}", docId, verId);

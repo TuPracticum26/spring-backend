@@ -1,5 +1,6 @@
 package com.sap.documentmgn.entity;
 
+import com.sap.documentmgn.dto.CommentDTO;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;

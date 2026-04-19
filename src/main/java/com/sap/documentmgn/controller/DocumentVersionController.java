@@ -1,10 +1,13 @@
 package com.sap.documentmgn.controller;
 
+import com.sap.documentmgn.dto.CommentDTO;
 import com.sap.documentmgn.dto.DocumentVersionDTO;
 import com.sap.documentmgn.service.DocumentVersionService;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
@@ -12,6 +15,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/documents")
+@Validated
 public class DocumentVersionController {
     private final DocumentVersionService documentVersionService;
 
@@ -22,20 +26,15 @@ public class DocumentVersionController {
     @PreAuthorize("hasAnyRole('ADMIN','AUTHOR','REVIEWER')")
     @PostMapping("/{docId}/versions/{verId}")
     public ResponseEntity<DocumentVersionDTO> getDocumentVersionDetails(
-        @PathVariable Long docId,
-        @PathVariable Long verId){
+        @PathVariable @Min(1) Long docId,
+        @PathVariable @Min(1) Long verId){
         DocumentVersionDTO versionDetails = documentVersionService.getVersionDetails(docId,verId);
         return ResponseEntity.ok(versionDetails);
     }
 
-
     @PreAuthorize("hasRole('ADMIN') || hasRole('REVIEWER')")
     @PostMapping("{docId}/versions/{versionNumber}/approve")
-
-    public ResponseEntity<?> DocumentApprove(@PathVariable @Min(1) Long docId, @PathVariable Long versionNumber, Principal principal){
-        if(docId == null || docId <= 0 || versionNumber == null || versionNumber <= 0){
-            return ResponseEntity.badRequest().body("Invalid document id or version number");
-        }
+    public ResponseEntity<?> documentApprove(@PathVariable @Min(1) Long docId, @PathVariable @Min(1) Long versionNumber, Principal principal){
         String username = principal.getName();
         if(username == null || username.isEmpty()){
             return ResponseEntity.status(401).body("User not authenticated");
@@ -46,35 +45,27 @@ public class DocumentVersionController {
 
     @PreAuthorize("hasRole('ADMIN') || hasRole('REVIEWER')")
     @PostMapping("/{docId}/versions/{versionNumber}/reject")
-    public DocumentVersionDTO rejectVersion(@PathVariable @Min(1) Long docId, @PathVariable Long versionNumber) {
+    public DocumentVersionDTO rejectVersion(@PathVariable @Min(1) Long docId, @PathVariable @Min(1) Long versionNumber) {
         return documentVersionService.rejectVersion(docId, versionNumber);
     }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'AUTHOR', 'REVIEWER')")
     @GetMapping("/{docId}/versions/{verId}/comments")
-
-    public List<String> postComment(@PathVariable @Min(1) Long docId, @PathVariable @Min(1) Long verId) {
+    public List<String> getComment(@PathVariable @Min(1) Long docId, @PathVariable @Min(1) Long verId) {
         return documentVersionService.getComments(docId, verId);
     }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'AUTHOR', 'REVIEWER')")
     @PostMapping("/{docId}/versions/{verId}/comments")
-
-    public ResponseEntity<?> postComment(@PathVariable @Min(1) Long docId, @PathVariable @Min(1) Long verId, @RequestBody String comment) {
-        if(comment == null || comment.trim().isEmpty()){
-            return ResponseEntity.badRequest().body("Comment cannot be empty");
-        }
-        if(comment.length() > 1000){
-            return ResponseEntity.badRequest().body("Comment too long (max 1000 characters)");
-        }
-        documentVersionService.postComment(docId, verId, comment);
+    public ResponseEntity<?> postComment(@PathVariable @Min(1) Long docId, @PathVariable @Min(1) Long verId,@Valid @RequestBody CommentDTO comment) {
+        documentVersionService.postComment(docId, verId, comment.getComment());
         return ResponseEntity.ok().build();
     }
 
     //Взема версия по номер
     @PreAuthorize("hasAnyRole('ADMIN', 'AUTHOR', 'REVIEWER')")
     @GetMapping("/{docId}/versions/num/{versionNumber}")
-    public ResponseEntity<DocumentVersionDTO> getDocumentVersionByNumber(@PathVariable Long docId, @PathVariable Integer versionNumber){
+    public ResponseEntity<DocumentVersionDTO> getDocumentVersionByNumber(@PathVariable @Min(1) Long docId, @PathVariable @Min(1) Integer versionNumber){
         DocumentVersionDTO version = documentVersionService.getSpecificVersion(docId, versionNumber);
         return ResponseEntity.ok(version);
     }

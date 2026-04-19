@@ -3,7 +3,6 @@ package com.sap.documentmgn.service;
 import com.sap.documentmgn.dto.DocumentVersionDTO;
 import com.sap.documentmgn.dto.UserDTO;
 import com.sap.documentmgn.dto.UserRegistrationDTO;
-import com.sap.documentmgn.entity.Document;
 import com.sap.documentmgn.entity.DocumentVersion;
 import com.sap.documentmgn.entity.ROLES;
 import com.sap.documentmgn.entity.User;
@@ -23,7 +22,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -58,6 +56,10 @@ public class UserService{
                     log.warn("User with id {} not found", userId);
                     return new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
                 });
+        if (!admin.getRoles().contains(ROLES.ADMIN)) {
+            log.warn("User {} attempted to set role without admin privileges", adminUsername);
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only an admin can set roles");
+        }
 
         if (user.getId().equals(admin.getId())) {
             log.warn("Admin {} attempted to change their own role", adminUsername);

@@ -104,6 +104,7 @@ public class UserServiceUnitTests {
         User admin = new User();
         admin.setId(1L);
         admin.setUsername("testAdmin");
+        admin.setRoles(List.of(ROLES.ADMIN));
 
         when(userRepository.findByUsername("testAdmin"))
                 .thenReturn(Optional.of(admin));

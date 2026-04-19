@@ -60,20 +60,11 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/api/v1/admin/deleteUser/{userId}")
     public ResponseEntity<?> deleteUser(@PathVariable @Min(1) Long userId, @NonNull Principal principal) {
         String initUsername = principal.getName();
         userService.deleteUser(userId, initUsername);
-        return ResponseEntity.ok().build();
-    }
-
-    @PreAuthorize("hasRole('ADMIN') || hasRole('AUTHOR')")
-    @DeleteMapping("/api/v1/deleteDocument/{documentId}")
-    public ResponseEntity<?> deleteDocument(@PathVariable @Min(1) Long documentId, @NonNull Principal principal) {
-
-        String username = principal.getName();
-        documentService.deleteDocument(documentId, username);
-
         return ResponseEntity.ok().build();
     }
 }

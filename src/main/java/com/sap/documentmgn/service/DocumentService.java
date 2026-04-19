@@ -1,6 +1,5 @@
 package com.sap.documentmgn.service;
 import com.sap.documentmgn.dto.DocumentDTO;
-import com.sap.documentmgn.dto.DocumentVersionDTO;
 import com.sap.documentmgn.entity.*;
 import com.sap.documentmgn.mapper.DocumentMapper;
 import com.sap.documentmgn.repository.DocumentRepository;

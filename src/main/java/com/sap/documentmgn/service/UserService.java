@@ -44,6 +44,7 @@ public class UserService{
         return users.stream().map(userMapper::toUserDTO).collect(Collectors.toList());
     }
 
+    @Transactional
     public void setRole(Long userId, List<ROLES> roles, String adminUsername) {
         User admin = userRepository.findByUsername(adminUsername)
                 .orElseThrow(() -> {

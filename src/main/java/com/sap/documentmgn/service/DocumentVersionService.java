@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
@@ -25,6 +26,29 @@ public class DocumentVersionService {
     private final DocumentRepository documentRepository;
     private final DocumentVersionMapper documentVersionMapper;
 
+    @Transactional
+    public void createVersion(Long docId, Integer versionNumber, String username){
+         User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> {
+                    log.warn("User with username {} not found", username);
+                    return new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
+                });
+        Document document = documentRepository.findById(docId)
+                .orElseThrow(() -> {
+                    log.warn("Document with number {} not found", versionNumber);
+                    return new ResponseStatusException(HttpStatus.NOT_FOUND, "Document not found");
+                });
+        DocumentVersion newDocumentVersion = new DocumentVersion();
+        newDocumentVersion.setDocument(document);
+        newDocumentVersion.setVersionNumber(versionNumber);
+        newDocumentVersion.setStatus(VersionStatus.PENDING);
+        newDocumentVersion.updateEvent(user);
+
+        documentVersionRepository.save(newDocumentVersion);
+        log.info("Created new version number {} for document with id {} by user {}", versionNumber, docId, username);
+    }
+
+    @Transactional
     public void approveVersion(Long docId, Long versionNumber, String username) {
         DocumentVersion version = documentVersionRepository
                 .findByDocumentIdAndVersionNumber(docId, versionNumber)
@@ -52,6 +76,7 @@ public class DocumentVersionService {
         log.info("Version number {} for document with id {} approved by user {}", versionNumber, docId, username);
     }
 
+    @Transactional
     public DocumentVersionDTO rejectVersion(Long docId, Long versionNumber) {
         DocumentVersion version = documentVersionRepository
                 .findByDocumentIdAndVersionNumber(docId,versionNumber)
@@ -146,6 +171,7 @@ public class DocumentVersionService {
         return documentVersion.getComments();
     }
 
+    @Transactional
     public void postComment(Long docId, Long verId, String comment) {
         DocumentVersion documentVersion = documentVersionRepository
                 .findByDocumentIdAndVersionNumber(docId, verId)

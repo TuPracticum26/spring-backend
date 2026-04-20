@@ -3,6 +3,7 @@ package com.sap.documentmgn.controller;
 import com.sap.documentmgn.dto.DocumentDTO;
 import com.sap.documentmgn.service.DocumentService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -40,7 +41,7 @@ public class DocumentController {
     @PreAuthorize("hasAuthority('ROLE_AUTHOR') or hasRole('AUTHOR')")
     public ResponseEntity<DocumentDTO> createDocument(
             @Valid @RequestBody DocumentDTO documentDTO,
-            @NonNull Principal principal) {
+            @NotNull Principal principal) {
             
         String username = principal.getName();
         DocumentDTO createdDocument = documentService.createDocument(documentDTO, username);
@@ -52,7 +53,7 @@ public class DocumentController {
     @PreAuthorize("hasAnyRole('ADMIN', 'AUTHOR')")
     public ResponseEntity<Void> deleteDocument(
             @PathVariable @Min(1) Long documentId,
-            @NonNull Principal principal) {
+            @NotNull Principal principal) {
 
         String username = principal.getName();
         documentService.deleteDocument(documentId, username);

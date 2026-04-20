@@ -5,6 +5,7 @@ import com.sap.documentmgn.dto.DocumentVersionDTO;
 import com.sap.documentmgn.service.DocumentVersionService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -24,12 +25,20 @@ public class DocumentVersionController {
     }
 
     @PreAuthorize("hasAnyRole('ADMIN','AUTHOR','REVIEWER')")
-    @PostMapping("/{docId}/versions/{verId}")
+    @GetMapping("/{docId}/versions/{verId}")
     public ResponseEntity<DocumentVersionDTO> getDocumentVersionDetails(
         @PathVariable @Min(1) Long docId,
         @PathVariable @Min(1) Long verId){
         DocumentVersionDTO versionDetails = documentVersionService.getVersionDetails(docId,verId);
         return ResponseEntity.ok(versionDetails);
+    }
+
+    @PreAuthorize("hasAnyRole('ADMIN','AUTHOR')")
+    @PostMapping("/{docId}/versions/{verId}")
+    public ResponseEntity<?> postDocumentVersion(@PathVariable @Min(1) Long docId, @PathVariable @Min(1) Integer verId, @NotNull Principal principal){
+        String username = principal.getName();
+        documentVersionService.createVersion(docId, verId, username);
+        return ResponseEntity.ok().build();
     }
 
     @PreAuthorize("hasRole('ADMIN') || hasRole('REVIEWER')")

@@ -43,7 +43,7 @@ public class DocumentVersionController {
 
     @PreAuthorize("hasRole('ADMIN') || hasRole('REVIEWER')")
     @PostMapping("{docId}/versions/{versionNumber}/approve")
-    public ResponseEntity<?> documentApprove(@PathVariable @Min(1) Long docId, @PathVariable @Min(1) Long versionNumber,@NonNull Principal principal){
+    public ResponseEntity<?> documentApprove(@PathVariable @Min(1) Long docId, @PathVariable @Min(1) Long versionNumber,@NotNull Principal principal){
         String username = principal.getName();
         documentVersionService.approveVersion(docId, versionNumber, username);
         return ResponseEntity.ok().build();

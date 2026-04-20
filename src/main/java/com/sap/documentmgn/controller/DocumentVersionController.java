@@ -5,6 +5,7 @@ import com.sap.documentmgn.dto.DocumentVersionDTO;
 import com.sap.documentmgn.service.DocumentVersionService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
+import org.jspecify.annotations.NonNull;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -24,7 +25,7 @@ public class DocumentVersionController {
     }
 
     @PreAuthorize("hasAnyRole('ADMIN','AUTHOR','REVIEWER')")
-    @PostMapping("/{docId}/versions/{verId}")
+    @GetMapping("/{docId}/versions/{verId}")
     public ResponseEntity<DocumentVersionDTO> getDocumentVersionDetails(
         @PathVariable @Min(1) Long docId,
         @PathVariable @Min(1) Long verId){
@@ -34,11 +35,8 @@ public class DocumentVersionController {
 
     @PreAuthorize("hasRole('ADMIN') || hasRole('REVIEWER')")
     @PostMapping("{docId}/versions/{versionNumber}/approve")
-    public ResponseEntity<?> documentApprove(@PathVariable @Min(1) Long docId, @PathVariable @Min(1) Long versionNumber, Principal principal){
+    public ResponseEntity<?> documentApprove(@PathVariable @Min(1) Long docId, @PathVariable @Min(1) Long versionNumber,@NonNull Principal principal){
         String username = principal.getName();
-        if(username == null || username.isEmpty()){
-            return ResponseEntity.status(401).body("User not authenticated");
-        }
         documentVersionService.approveVersion(docId, versionNumber, username);
         return ResponseEntity.ok().build();
     }

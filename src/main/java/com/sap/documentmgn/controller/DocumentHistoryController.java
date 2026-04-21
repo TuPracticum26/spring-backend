@@ -3,6 +3,7 @@ package com.sap.documentmgn.controller;
 import com.sap.documentmgn.dto.DocumentHistoryDTO;
 import com.sap.documentmgn.dto.DocumentHistorySummaryDTO;
 import com.sap.documentmgn.service.DocumentVersionService;
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -20,7 +21,7 @@ public class DocumentHistoryController {
 
     @PreAuthorize("hasAnyRole('ADMIN', 'AUTHOR', 'REVIEWER')")
     @GetMapping
-    public ResponseEntity<DocumentHistoryDTO> getHistory(@PathVariable Long docId) {
+    public ResponseEntity<DocumentHistoryDTO> getHistory(@PathVariable @Min(1) Long docId) {
         return ResponseEntity.ok(
                 documentVersionService.getDocumentHistory(docId)
         );
@@ -28,7 +29,7 @@ public class DocumentHistoryController {
 
     @PreAuthorize("hasAnyRole('ADMIN', 'AUTHOR', 'REVIEWER')")
     @GetMapping("/summary")
-    public ResponseEntity<DocumentHistorySummaryDTO> getHistorySummary(@PathVariable Long docId) {
+    public ResponseEntity<DocumentHistorySummaryDTO> getHistorySummary(@PathVariable @Min(1) Long docId) {
         return ResponseEntity.ok(
                 documentVersionService.getDocumentHistorySummary(docId)
         );

@@ -1,12 +1,12 @@
 -- ====================================================
--- Disable foreign key checks temporarily
+-- 1. Disable foreign key checks temporarily
 -- ====================================================
 SET FOREIGN_KEY_CHECKS=0;
 
 -- ====================================================
--- Users
-
-INSERT INTO users(id, username, password) VALUES
+-- 2. Users (Idempotent INSERT)
+-- ====================================================
+INSERT IGNORE INTO users(id, username, password) VALUES
 (1, 'Georgi Goshenkov', '$2y$10$AdCe8GASmz2GcFp7vyTg1.ZRlr7CKGmG2toIa2FOqaSFWoc6aUpcW'),
 (2, 'Stefan Stefanov', '$2y$10$1VawqRd2Jsgh2H7DUW14TOUj1Ta9IGZUg3w5q1h5ftuE5cs0K.ZM.'),
 (3, 'Dimitur Dimitrov', '$2y$10$nhFAQ8njA76rjAPRFl.4/OHxGPd2IBD1zzISu83mZDWwpNGrLjerm'),
@@ -20,25 +20,23 @@ INSERT INTO users(id, username, password) VALUES
 (11, 'Konstantin Konstantinov', '$2y$10$wQTYRI1J7bqFJ5VgkVnKTOh4hTwZKQP6XrOLhvRurgku3M6WHVHwi');
 
 -- ====================================================
--- User Roles
+-- 3. User Roles (Check before INSERT)
 -- ====================================================
-INSERT INTO user_roles(user_id, role) VALUES
-(1, 'ADMIN'),
-(2, 'AUTHOR'),
-(3, 'AUTHOR'),
-(4, 'AUTHOR'),
-(5, 'AUTHOR'),
-(6, 'AUTHOR'),
-(7, 'REVIEWER'),
-(8, 'REVIEWER'),
-(9, 'REVIEWER'),
-(10, 'READER'),
-(11, 'READER');
+INSERT INTO user_roles(user_id, role)
+SELECT * FROM (
+    SELECT 1 as u, 'ADMIN' as r UNION SELECT 2, 'AUTHOR' UNION SELECT 3, 'AUTHOR' UNION
+    SELECT 4, 'AUTHOR' UNION SELECT 5, 'AUTHOR' UNION SELECT 6, 'AUTHOR' UNION
+    SELECT 7, 'REVIEWER' UNION SELECT 8, 'REVIEWER' UNION SELECT 9, 'REVIEWER' UNION
+    SELECT 10, 'READER' UNION SELECT 11, 'READER'
+) AS tmp
+WHERE NOT EXISTS (
+    SELECT 1 FROM user_roles ur WHERE ur.user_id = tmp.u AND ur.role = tmp.r
+);
 
 -- ====================================================
--- Documents
+-- 4. Documents (Idempotent INSERT)
 -- ====================================================
-INSERT INTO documents(id, title, author_id, created_at) VALUES
+INSERT IGNORE INTO documents(id, title, author_id, created_at) VALUES
 (1, 'Document 1', 2, '2026-01-26'),
 (2, 'Document 2', 3, '2026-01-27'),
 (3, 'Document 3', 4, '2026-01-28'),
@@ -51,9 +49,9 @@ INSERT INTO documents(id, title, author_id, created_at) VALUES
 (10, 'Document 10', 2, '2026-02-04');
 
 -- ====================================================
--- Document Versions
+-- 5. Document Versions (Idempotent INSERT)
 -- ====================================================
-INSERT INTO document_versions(id, document_id, version_number, content, status, created_by_id, created_at) VALUES
+INSERT IGNORE INTO document_versions(id, document_id, version_number, content, status, created_by_id, created_at) VALUES
 (1, 1, 1, 'First draft of Q1 financial report', 'DRAFT', 1, '2026-01-10 09:00:00'),
 (2, 1, 2, 'Updated financial report with corrected revenue figures', 'PENDING', 2, '2026-01-12 10:30:00'),
 (3, 1, 3, 'Final Q1 financial report approved by finance', 'APPROVED', 3, '2026-01-15 14:00:00'),
@@ -156,28 +154,34 @@ INSERT INTO document_versions(id, document_id, version_number, content, status, 
 (100, 3, 12, 'Final annual performance review form', 'APPROVED', 10, '2026-02-16 14:00:00');
 
 -- ====================================================
--- version_comments table
+-- 6. Version Comments (Idempotent using SELECT WHERE NOT EXISTS)
 -- ====================================================
-INSERT INTO version_comments(version_id, comment) VALUES
-(1, 'Initial draft created for review'),
-(2, 'Updated introduction section'),
-(2, 'Fixed formatting issues'),
-(3, 'First version submitted'),
-(4, 'All sections reviewed and approved'),
-(4, 'Compliance check passed'),
-(5, 'Draft pending team review'),
-(6, 'Rejected due to missing references'),
-(6, 'Content does not meet style guidelines'),
-(7, 'Awaiting manager sign-off'),
-(8, 'Pending legal review'),
-(9, 'Approved after final revision'),
-(10, 'Work in progress'),
-(11, 'Under review by senior editor'),
-(12, 'Approved with minor notes'),
-(12, 'Archived for compliance records'),
-(13, 'Initial draft, not yet reviewed');
+INSERT INTO version_comments(version_id, comment)
+SELECT * FROM (
+    SELECT 1 as v, 'Initial draft created for review' as c UNION
+    SELECT 2, 'Updated introduction section' UNION
+    SELECT 2, 'Fixed formatting issues' UNION
+    SELECT 3, 'First version submitted' UNION
+    SELECT 4, 'All sections reviewed and approved' UNION
+    SELECT 4, 'Compliance check passed' UNION
+    SELECT 5, 'Draft pending team review' UNION
+    SELECT 6, 'Rejected due to missing references' UNION
+    SELECT 6, 'Content does not meet style guidelines' UNION
+    SELECT 7, 'Awaiting manager sign-off' UNION
+    SELECT 8, 'Pending legal review' UNION
+    SELECT 9, 'Approved after final revision' UNION
+    SELECT 10, 'Work in progress' UNION
+    SELECT 11, 'Under review by senior editor' UNION
+    SELECT 12, 'Approved with minor notes' UNION
+    SELECT 12, 'Archived for compliance records' UNION
+    SELECT 13, 'Initial draft, not yet reviewed'
+) AS seed_data
+WHERE NOT EXISTS (
+    SELECT 1 FROM version_comments vc
+    WHERE vc.version_id = seed_data.v AND vc.comment = seed_data.c
+);
 
 -- ====================================================
--- Re-enable foreign key checks
+-- 7. Re-enable foreign key checks
 -- ====================================================
 SET FOREIGN_KEY_CHECKS=1;

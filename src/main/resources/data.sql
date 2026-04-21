@@ -6,7 +6,7 @@ SET FOREIGN_KEY_CHECKS=0;
 -- ====================================================
 -- Users
 
-INSERT INTO users(id, username, password) VALUES
+INSERT IGNORE INTO users(id, username, password) VALUES
 (1, 'Georgi Goshenkov', '$2y$10$AdCe8GASmz2GcFp7vyTg1.ZRlr7CKGmG2toIa2FOqaSFWoc6aUpcW'),
 (2, 'Stefan Stefanov', '$2y$10$1VawqRd2Jsgh2H7DUW14TOUj1Ta9IGZUg3w5q1h5ftuE5cs0K.ZM.'),
 (3, 'Dimitur Dimitrov', '$2y$10$nhFAQ8njA76rjAPRFl.4/OHxGPd2IBD1zzISu83mZDWwpNGrLjerm'),
@@ -22,7 +22,7 @@ INSERT INTO users(id, username, password) VALUES
 -- ====================================================
 -- User Roles
 -- ====================================================
-INSERT INTO user_roles(user_id, role) VALUES
+INSERT IGNORE INTO user_roles(user_id, role) VALUES
 (1, 'ADMIN'),
 (2, 'AUTHOR'),
 (3, 'AUTHOR'),
@@ -38,7 +38,7 @@ INSERT INTO user_roles(user_id, role) VALUES
 -- ====================================================
 -- Documents
 -- ====================================================
-INSERT INTO documents(id, title, author_id, created_at) VALUES
+INSERT IGNORE INTO documents(id, title, author_id, created_at) VALUES
 (1, 'Document 1', 2, '2026-01-26'),
 (2, 'Document 2', 3, '2026-01-27'),
 (3, 'Document 3', 4, '2026-01-28'),
@@ -53,7 +53,7 @@ INSERT INTO documents(id, title, author_id, created_at) VALUES
 -- ====================================================
 -- Document Versions
 -- ====================================================
-INSERT INTO document_versions(id, document_id, version_number, content, status, created_by_id, created_at) VALUES
+INSERT IGNORE INTO document_versions(id, document_id, version_number, content, status, created_by_id, created_at) VALUES
 (1, 1, 1, 'First draft of Q1 financial report', 'DRAFT', 1, '2026-01-10 09:00:00'),
 (2, 1, 2, 'Updated financial report with corrected revenue figures', 'PENDING', 2, '2026-01-12 10:30:00'),
 (3, 1, 3, 'Final Q1 financial report approved by finance', 'APPROVED', 3, '2026-01-15 14:00:00'),
@@ -158,7 +158,7 @@ INSERT INTO document_versions(id, document_id, version_number, content, status, 
 -- ====================================================
 -- version_comments table
 -- ====================================================
-INSERT INTO version_comments(version_id, comment) VALUES
+INSERT IGNORE INTO version_comments(version_id, comment) VALUES
 (1, 'Initial draft created for review'),
 (2, 'Updated introduction section'),
 (2, 'Fixed formatting issues'),

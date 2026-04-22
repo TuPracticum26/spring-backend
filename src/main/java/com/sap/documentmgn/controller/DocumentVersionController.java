@@ -2,6 +2,7 @@ package com.sap.documentmgn.controller;
 
 import com.sap.documentmgn.dto.CommentDTO;
 import com.sap.documentmgn.dto.DocumentVersionDTO;
+import com.sap.documentmgn.dto.UserRegistrationDTO;
 import com.sap.documentmgn.service.DocumentVersionService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
@@ -33,11 +34,11 @@ public class DocumentVersionController {
         return ResponseEntity.ok(versionDetails);
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN','AUTHOR')")
+    @PreAuthorize("hasAnyRole('ADMIN','AUTHOR','REVIEWER')")
     @PostMapping("/{docId}/versions/{verId}")
-    public ResponseEntity<?> postDocumentVersion(@PathVariable @Min(1) Long docId, @PathVariable @Min(1) Integer verId, @NotNull Principal principal){
+    public ResponseEntity<?> postDocumentVersion(@PathVariable @Min(1) Long docId, @PathVariable @Min(1) Integer verId, @Valid @RequestBody DocumentVersionDTO versionDTO, @NotNull Principal principal){
         String username = principal.getName();
-        documentVersionService.createVersion(docId, verId, username);
+        documentVersionService.createVersion(docId, verId, versionDTO, username);
         return ResponseEntity.ok().build();
     }
 

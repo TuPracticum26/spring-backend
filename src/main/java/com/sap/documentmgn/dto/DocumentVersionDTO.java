@@ -14,6 +14,7 @@ public class DocumentVersionDTO {
     private VersionStatus status;
 
     private Integer versionNumber;
+    private String title;
     private String content;
     private String createdByUsername;
     private LocalDateTime createdAt;

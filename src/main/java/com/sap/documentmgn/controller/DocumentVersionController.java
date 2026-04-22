@@ -63,9 +63,9 @@ public class DocumentVersionController {
 
     @PreAuthorize("hasAnyRole('ADMIN', 'AUTHOR', 'REVIEWER')")
     @PostMapping("/{docId}/versions/{verId}/comments")
-    public ResponseEntity<?> postComment(@PathVariable @Min(1) Long docId, @PathVariable @Min(1) Long verId,@Valid @RequestBody CommentDTO comment) {
+    public ResponseEntity<CommentDTO> postComment(@PathVariable @Min(1) Long docId, @PathVariable @Min(1) Long verId, @Valid @RequestBody CommentDTO comment) {
         documentVersionService.postComment(docId, verId, comment.getComment());
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(comment);
     }
 
     //Взема версия по номер

@@ -46,6 +46,12 @@ public class UserController {
     }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'AUTHOR', 'REVIEWER')")
+    @GetMapping("/api/v1/users/versions/pending/{page}")
+    public List<DocumentVersionDTO> getAllPendingTeamVersionsPage(@PathVariable @Min(0) int page) {
+        return userService.getAllPendingTeamVersionsPage(page);
+    }
+
+    @PreAuthorize("hasAnyRole('ADMIN', 'AUTHOR', 'REVIEWER')")
     @GetMapping("/api/v1/users/{userId}/versions")
     public List<DocumentVersionDTO> getAllUserVersions(@PathVariable @Min(1) Long userId) {
         return userService.getAllUserVersions(userId);

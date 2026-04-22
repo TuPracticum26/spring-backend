@@ -10,6 +10,7 @@ import com.sap.documentmgn.mapper.UserMapper;
 import com.sap.documentmgn.repository.DocumentRepository;
 import com.sap.documentmgn.repository.DocumentVersionRepository;
 import com.sap.documentmgn.repository.UserRepository;
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -168,6 +169,23 @@ public class UserService{
     public List<DocumentVersionDTO> getAllTeamVersionsPage(int offset) {
         Pageable pageable = PageRequest.of(offset, 10);
         Page<DocumentVersion> userDocVersions = documentVersionRepository.findAll(pageable);
+        return userDocVersions.stream()
+                .map(dv -> new DocumentVersionDTO(
+                        dv.getId(),
+                        dv.getStatus(),
+                        dv.getVersionNumber(),
+                        dv.getContent(),
+                        dv.getCreatedBy().getUsername(),
+                        dv.getCreatedAt(),
+                        dv.getDocument().getId(),
+                        dv.getComments()
+                ))
+                .toList();
+    }
+
+    public List<DocumentVersionDTO> getAllPendingTeamVersionsPage(@Min(0) int offset) {
+        Pageable pageable = PageRequest.of(offset, 10);
+        Page<DocumentVersion> userDocVersions = documentVersionRepository.findAllPendingPage(pageable);
         return userDocVersions.stream()
                 .map(dv -> new DocumentVersionDTO(
                         dv.getId(),

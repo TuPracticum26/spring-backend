@@ -37,6 +37,10 @@
 | `PATCH` | `/api/versions/{id}/status` | Смяна на статус (Review) | REVIEWER |
 | `GET` | `/api/users` | Управление на потребители | ADMIN |
 
+<img width="3800" height="675" alt="documentcontroller" src="https://github.com/user-attachments/assets/7ed1ff87-2798-427f-ba04-7d753a79c35f" />
+<img width="3795" height="1087" alt="documentversioncontrolle" src="https://github.com/user-attachments/assets/36425c9c-a433-4611-a104-0e1cabebccb0" />
+<img width="3790" height="820" alt="auth_controller_doc_history_controller" src="https://github.com/user-attachments/assets/bdcefb27-7eea-4c7f-95ec-8d6b45329a5d" />
+
 ## Workflow (Жизнен цикъл)
 Бакендът налага автоматизиран работен процес, който не позволява прескачане на етапи:
 
@@ -59,6 +63,8 @@
 
 ## База данни
 Използва се релационна схема в MariaDB, проектирана за проследимост на промените.
+<img width="2245" height="1327" alt="database" src="https://github.com/user-attachments/assets/0fceb8c8-3dbd-4308-a606-cb7d39c1035e" />
+
 
 ## API Документация (Swagger)
 За улеснение, проектът предоставя пълен Swagger UI интерфейс, където може да се тества всеки ендпоинт, като първо се оторизирате чрез JWT токен.

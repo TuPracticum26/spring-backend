@@ -38,7 +38,7 @@ public class DocumentController {
 
     // СЪЗДАВАНЕ НА ДОКУМЕНТ - Достъпно за автори
     @PostMapping
-    @PreAuthorize("hasAuthority('ROLE_AUTHOR') or hasRole('AUTHOR')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'AUTHOR')")
     public ResponseEntity<DocumentDTO> createDocument(
             @Valid @RequestBody DocumentDTO documentDTO,
             @NotNull Principal principal) {

@@ -62,6 +62,7 @@ public class DocumentService {
         DocumentVersion firstVersion = new DocumentVersion();
         firstVersion.setDocument(document);
         firstVersion.setVersionNumber(1);
+        firstVersion.setTitle("Initial Version");
         firstVersion.setContent(documentDTO.getContent());
         firstVersion.setStatus(VersionStatus.DRAFT);
         firstVersion.updateEvent(author);

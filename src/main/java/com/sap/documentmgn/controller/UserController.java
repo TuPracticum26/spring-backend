@@ -39,13 +39,11 @@ public class UserController {
         return userService.getUsersByTen(page);
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN', 'AUTHOR', 'REVIEWER')")
     @GetMapping("/api/v1/users/versions/{page}")
     public List<DocumentVersionDTO> getAllTeamVersionsPage(@PathVariable @Min(0) int page) {
         return userService.getAllTeamVersionsPage(page);
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN', 'AUTHOR', 'REVIEWER')")
     @GetMapping("/api/v1/users/versions/")
     public List<DocumentVersionDTO> getAllTeamVersionsSearch() {
         return userService.getAllTeamVersionsSearch();

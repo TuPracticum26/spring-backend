@@ -25,7 +25,6 @@ public class DocumentVersionController {
         this.documentVersionService = documentVersionService;
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN','AUTHOR','REVIEWER')")
     @GetMapping("/{docId}/versions/{verId}")
     public ResponseEntity<DocumentVersionDTO> getDocumentVersionDetails(
         @PathVariable @Min(1) Long docId,
@@ -56,7 +55,6 @@ public class DocumentVersionController {
         return documentVersionService.rejectVersion(docId, versionNumber);
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN', 'AUTHOR', 'REVIEWER')")
     @GetMapping("/{docId}/versions/{verId}/comments")
     public List<String> getComment(@PathVariable @Min(1) Long docId, @PathVariable @Min(1) Long verId) {
         return documentVersionService.getComments(docId, verId);
@@ -70,7 +68,6 @@ public class DocumentVersionController {
     }
 
     //Взема версия по номер
-    @PreAuthorize("hasAnyRole('ADMIN', 'AUTHOR', 'REVIEWER')")
     @GetMapping("/{docId}/versions/num/{versionNumber}")
     public ResponseEntity<DocumentVersionDTO> getDocumentVersionByNumber(@PathVariable @Min(1) Long docId, @PathVariable @Min(1) Integer versionNumber){
         DocumentVersionDTO version = documentVersionService.getSpecificVersion(docId, versionNumber);

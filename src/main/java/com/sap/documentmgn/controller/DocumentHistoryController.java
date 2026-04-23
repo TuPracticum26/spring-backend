@@ -19,7 +19,6 @@ public class DocumentHistoryController {
 
     private final DocumentVersionService documentVersionService;
 
-    @PreAuthorize("hasAnyRole('ADMIN', 'AUTHOR', 'REVIEWER')")
     @GetMapping
     public ResponseEntity<DocumentHistoryDTO> getHistory(@PathVariable @Min(1) Long docId) {
         return ResponseEntity.ok(
@@ -27,7 +26,6 @@ public class DocumentHistoryController {
         );
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN', 'AUTHOR', 'REVIEWER')")
     @GetMapping("/summary")
     public ResponseEntity<DocumentHistorySummaryDTO> getHistorySummary(@PathVariable @Min(1) Long docId) {
         return ResponseEntity.ok(

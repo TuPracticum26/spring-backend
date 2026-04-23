@@ -188,8 +188,42 @@ public class UserService{
 
     public List<DocumentVersionDTO> getAllPendingTeamVersionsPage(@Min(0) int offset) {
         Pageable pageable = PageRequest.of(offset, 10);
-        Page<DocumentVersion> userDocVersions = documentVersionRepository.findAllPendingPage(pageable);
-        return userDocVersions.stream()
+        Page<DocumentVersion> pendingVersionsPage = documentVersionRepository.findAllPendingPage(pageable);
+        return pendingVersionsPage.stream()
+                .map(dv -> new DocumentVersionDTO(
+                        dv.getId(),
+                        dv.getStatus(),
+                        dv.getVersionNumber(),
+                        dv.getTitle(),
+                        dv.getContent(),
+                        dv.getCreatedBy().getUsername(),
+                        dv.getCreatedAt(),
+                        dv.getDocument().getId(),
+                        dv.getComments()
+                ))
+                .toList();
+    }
+
+    public List<DocumentVersionDTO> getAllPendingTeamVersionsSearch() {
+        List<DocumentVersion> allPendingVersions = documentVersionRepository.findAllPending();
+        return allPendingVersions.stream()
+                .map(dv -> new DocumentVersionDTO(
+                        dv.getId(),
+                        dv.getStatus(),
+                        dv.getVersionNumber(),
+                        dv.getTitle(),
+                        dv.getContent(),
+                        dv.getCreatedBy().getUsername(),
+                        dv.getCreatedAt(),
+                        dv.getDocument().getId(),
+                        dv.getComments()
+                ))
+                .toList();
+    }
+
+    public List<DocumentVersionDTO> getAllTeamVersionsSearch() {
+        List<DocumentVersion> allTeamVersions = documentVersionRepository.findAll();
+        return allTeamVersions.stream()
                 .map(dv -> new DocumentVersionDTO(
                         dv.getId(),
                         dv.getStatus(),

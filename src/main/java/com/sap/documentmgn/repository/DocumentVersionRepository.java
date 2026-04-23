@@ -36,4 +36,8 @@ public interface DocumentVersionRepository extends JpaRepository<DocumentVersion
     @Query("SELECT dv FROM DocumentVersion dv " +
             "WHERE dv.status = 'PENDING'")
     Page<DocumentVersion> findAllPendingPage(Pageable pageable);
+
+    @Query("SELECT dv FROM DocumentVersion dv " +
+            "WHERE dv.status = 'PENDING'")
+    List<DocumentVersion> findAllPending();
 }

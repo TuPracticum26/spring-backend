@@ -46,9 +46,21 @@ public class UserController {
     }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'AUTHOR', 'REVIEWER')")
+    @GetMapping("/api/v1/users/versions/")
+    public List<DocumentVersionDTO> getAllTeamVersionsSearch() {
+        return userService.getAllTeamVersionsSearch();
+    }
+
+    @PreAuthorize("hasAnyRole('ADMIN', 'AUTHOR', 'REVIEWER')")
     @GetMapping("/api/v1/users/versions/pending/{page}")
     public List<DocumentVersionDTO> getAllPendingTeamVersionsPage(@PathVariable @Min(0) int page) {
         return userService.getAllPendingTeamVersionsPage(page);
+    }
+
+    @PreAuthorize("hasAnyRole('ADMIN', 'AUTHOR', 'REVIEWER')")
+    @GetMapping("/api/v1/users/versions/pending")
+    public List<DocumentVersionDTO> getAllPendingTeamVersionsSearch() {
+        return userService.getAllPendingTeamVersionsSearch();
     }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'AUTHOR', 'REVIEWER')")

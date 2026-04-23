@@ -27,7 +27,7 @@ public class DocumentVersionService {
     private final DocumentVersionMapper documentVersionMapper;
 
     @Transactional
-    public void createVersion(Long docId, Integer versionNumber, String username){
+    public void createVersion(Long docId, Integer versionNumber, DocumentVersionDTO versionInfo, String username){
          User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> {
                     log.warn("User with username {} not found", username);
@@ -41,6 +41,8 @@ public class DocumentVersionService {
         DocumentVersion newDocumentVersion = new DocumentVersion();
         newDocumentVersion.setDocument(document);
         newDocumentVersion.setVersionNumber(versionNumber);
+        newDocumentVersion.setTitle(versionInfo.getTitle());
+        newDocumentVersion.setContent(versionInfo.getContent());
         newDocumentVersion.setStatus(VersionStatus.PENDING);
         newDocumentVersion.updateEvent(user);
 

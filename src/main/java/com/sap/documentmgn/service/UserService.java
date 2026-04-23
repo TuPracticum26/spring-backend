@@ -10,6 +10,7 @@ import com.sap.documentmgn.mapper.UserMapper;
 import com.sap.documentmgn.repository.DocumentRepository;
 import com.sap.documentmgn.repository.DocumentVersionRepository;
 import com.sap.documentmgn.repository.UserRepository;
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -139,6 +140,7 @@ public class UserService{
                         dv.getId(),
                         dv.getStatus(),
                         dv.getVersionNumber(),
+                        dv.getTitle(),
                         dv.getContent(),
                         dv.getCreatedBy().getUsername(),
                         dv.getCreatedAt(),
@@ -156,6 +158,7 @@ public class UserService{
                         dv.getId(),
                         dv.getStatus(),
                         dv.getVersionNumber(),
+                        dv.getTitle(),
                         dv.getContent(),
                         dv.getCreatedBy().getUsername(),
                         dv.getCreatedAt(),
@@ -173,6 +176,59 @@ public class UserService{
                         dv.getId(),
                         dv.getStatus(),
                         dv.getVersionNumber(),
+                        dv.getTitle(),
+                        dv.getContent(),
+                        dv.getCreatedBy().getUsername(),
+                        dv.getCreatedAt(),
+                        dv.getDocument().getId(),
+                        dv.getComments()
+                ))
+                .toList();
+    }
+
+    public List<DocumentVersionDTO> getAllPendingTeamVersionsPage(@Min(0) int offset) {
+        Pageable pageable = PageRequest.of(offset, 10);
+        Page<DocumentVersion> pendingVersionsPage = documentVersionRepository.findAllPendingPage(pageable);
+        return pendingVersionsPage.stream()
+                .map(dv -> new DocumentVersionDTO(
+                        dv.getId(),
+                        dv.getStatus(),
+                        dv.getVersionNumber(),
+                        dv.getTitle(),
+                        dv.getContent(),
+                        dv.getCreatedBy().getUsername(),
+                        dv.getCreatedAt(),
+                        dv.getDocument().getId(),
+                        dv.getComments()
+                ))
+                .toList();
+    }
+
+    public List<DocumentVersionDTO> getAllPendingTeamVersionsSearch() {
+        List<DocumentVersion> allPendingVersions = documentVersionRepository.findAllPending();
+        return allPendingVersions.stream()
+                .map(dv -> new DocumentVersionDTO(
+                        dv.getId(),
+                        dv.getStatus(),
+                        dv.getVersionNumber(),
+                        dv.getTitle(),
+                        dv.getContent(),
+                        dv.getCreatedBy().getUsername(),
+                        dv.getCreatedAt(),
+                        dv.getDocument().getId(),
+                        dv.getComments()
+                ))
+                .toList();
+    }
+
+    public List<DocumentVersionDTO> getAllTeamVersionsSearch() {
+        List<DocumentVersion> allTeamVersions = documentVersionRepository.findAll();
+        return allTeamVersions.stream()
+                .map(dv -> new DocumentVersionDTO(
+                        dv.getId(),
+                        dv.getStatus(),
+                        dv.getVersionNumber(),
+                        dv.getTitle(),
                         dv.getContent(),
                         dv.getCreatedBy().getUsername(),
                         dv.getCreatedAt(),
